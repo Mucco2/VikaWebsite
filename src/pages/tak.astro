@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { site, phoneHref } from '../config/site';
+import { site, phoneHref, withBase } from '../config/site';
 ---
 
 <BaseLayout title="Tak for din henvendelse" noindex>
@@ -15,7 +15,7 @@ import { site, phoneHref } from '../config/site';
         Vi vender tilbage hurtigst muligt. Haster det, er du velkommen til at ringe på
         <a href={phoneHref} class="text-link">{site.phone}</a>.
       </p>
-      <a href="/" class="btn btn-secondary mt-10">Tilbage til forsiden</a>
+      <a href={withBase('/')} class="btn btn-secondary mt-10">Tilbage til forsiden</a>
     </div>
   </section>
 </BaseLayout>

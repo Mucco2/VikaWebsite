@@ -6,7 +6,7 @@ import Icon from '../../components/Icon.astro';
 import Checklist from '../../components/Checklist.astro';
 import ServiceCard from '../../components/ServiceCard.astro';
 import ContactSection from '../../components/ContactSection.astro';
-import { site, services, phoneHref, type Service } from '../../config/site';
+import { site, services, phoneHref, type Service, withBase } from '../../config/site';
 
 export const getStaticPaths = (() =>
   services.map((service) => ({ params: { slug: service.slug }, props: { service } }))) satisfies GetStaticPaths;
@@ -24,12 +24,12 @@ const others = services.filter((s) => s.slug !== service.slug).slice(0, 3);
     <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
       {
         service.bookable ? (
-          <a href="/book-vikar" class="btn btn-primary">
+          <a href={withBase('/book-vikar')} class="btn btn-primary">
             Book en vikar
             <Icon name="arrowRight" class="size-4" />
           </a>
         ) : (
-          <a href="/kontakt" class="btn btn-primary">
+          <a href={withBase('/kontakt')} class="btn btn-primary">
             Kontakt os
             <Icon name="arrowRight" class="size-4" />
           </a>

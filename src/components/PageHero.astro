@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../config/site';
+
 interface Props {
   eyebrow?: string;
   title: string;
@@ -17,12 +19,12 @@ const { eyebrow, title, text, crumbs } = Astro.props;
         <nav aria-label="Brødkrummer" class="mb-8">
           <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
             <li>
-              <a href="/" class="transition-colors hover:text-brand-700">Forside</a>
+              <a href={withBase('/')} class="transition-colors hover:text-brand-700">Forside</a>
             </li>
             {crumbs.map((crumb) => (
               <li class="flex items-center gap-2">
                 <span aria-hidden="true">/</span>
-                <a href={crumb.href} class="transition-colors hover:text-brand-700">
+                <a href={withBase(crumb.href)} class="transition-colors hover:text-brand-700">
                   {crumb.label}
                 </a>
               </li>

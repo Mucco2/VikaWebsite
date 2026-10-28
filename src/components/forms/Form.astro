@@ -3,7 +3,7 @@
  * Fælles formular-wrapper. Kobles automatisk på Netlify Forms eller Formspree
  * afhængigt af `forms.provider` i src/config/site.ts.
  */
-import { forms } from '../../config/site';
+import { forms, withBase } from '../../config/site';
 
 interface Props {
   /** Formularens navn (vises i Netlify-dashboardet) */
@@ -17,7 +17,8 @@ interface Props {
 
 const { name, endpoint, submitLabel, files = false } = Astro.props;
 const isNetlify = forms.provider === 'netlify';
-const action = isNetlify ? forms.successPage : forms.formspree[endpoint];
+const successPage = withBase(forms.successPage);
+const action = isNetlify ? successPage : forms.formspree[endpoint];
 ---
 
 <form
@@ -28,7 +29,7 @@ const action = isNetlify ? forms.successPage : forms.formspree[endpoint];
   novalidate
   data-form
   data-provider={forms.provider}
-  data-success={forms.successPage}
+  data-success={successPage}
   data-netlify={isNetlify ? 'true' : undefined}
   netlify-honeypot={isNetlify ? 'bot-field' : undefined}
 >
@@ -51,7 +52,7 @@ const action = isNetlify ? forms.successPage : forms.formspree[endpoint];
   <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <button type="submit" class="btn btn-primary" data-submit>{submitLabel}</button>
     <p class="text-sm text-muted sm:max-w-xs sm:text-right">
-      Vi behandler dine oplysninger fortroligt. Læs vores <a href="/privatlivspolitik" class="text-link font-medium"
+      Vi behandler dine oplysninger fortroligt. Læs vores <a href={withBase('/privatlivspolitik')} class="text-link font-medium"
         >privatlivspolitik</a
       >.
     </p>

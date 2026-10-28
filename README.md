@@ -58,6 +58,7 @@ Kør `npm run build`. Den færdige side ligger i `dist/` og kan hostes alle sted
 - **Netlify:** Forbind jeres Git-repo. `netlify.toml` er allerede sat op (build: `npm run build`, mappe: `dist`).
 - **Vercel:** Importér repoet. Astro bliver genkendt automatisk. Husk at bruge Formspree til formularerne.
 - **Cloudflare Pages:** Build command `npm run build`, output directory `dist`, og miljøvariablen `NODE_VERSION=22`. Brug Formspree til formularerne.
+- **GitHub Pages:** Gå til *Settings → Pages* i repoet, og vælg **Source: GitHub Actions** (ikke "Deploy from a branch"). Så bygger `.github/workflows/deploy.yml` siden ved hvert push til `main`. Siden ligger på `https://<brugernavn>.github.io/<repo>/`, og workflowet sætter selv base-stien. Interne links skal derfor skrives med `withBase('/sti')` fra `site.ts`. Brug Formspree til formularerne.
 
 Husk at sætte `site.url` til jeres rigtige domæne før deploy.
 

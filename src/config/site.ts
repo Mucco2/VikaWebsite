@@ -27,6 +27,13 @@ export const phoneHref = `tel:${site.phone.replace(/[^\d+]/g, '')}`;
 export const emailHref = `mailto:${site.email}`;
 
 /**
+ * Sætter base-stien foran interne links, fx withBase('/kontakt').
+ * Nødvendigt på GitHub Pages, hvor siden ligger i en undermappe (/VikaWebsite).
+ * På eget domæne er base-stien tom, og linket er uændret.
+ */
+export const withBase = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}${path}`;
+
+/**
  * Formularer
  * - 'netlify':   virker automatisk, når siden hostes på Netlify (inkl. CV-upload).
  * - 'formspree': opret formularer på formspree.io og indsæt jeres endpoints nedenfor.

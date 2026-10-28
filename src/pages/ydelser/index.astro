@@ -4,7 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import Checklist from '../../components/Checklist.astro';
 import ContactSection from '../../components/ContactSection.astro';
-import { services } from '../../config/site';
+import { services, withBase } from '../../config/site';
 ---
 
 <BaseLayout
@@ -29,7 +29,7 @@ import { services } from '../../config/site';
               {service.title}
             </h2>
             <p class="lead mt-5">{service.lead}</p>
-            <a href={`/ydelser/${service.slug}`} class="btn btn-secondary mt-8">
+            <a href={withBase(`/ydelser/${service.slug}`)} class="btn btn-secondary mt-8">
               Læs mere om {service.title.toLowerCase()}
               <Icon name="arrowRight" class="size-4" />
             </a>

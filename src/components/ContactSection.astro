@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { site, phoneHref, emailHref } from '../config/site';
+import { site, phoneHref, emailHref, withBase } from '../config/site';
 
 interface Props {
   title?: string;
@@ -27,8 +27,8 @@ const items = [
         <h2 id="kontakt-titel" class="h2 mt-3">{title}</h2>
         <p class="lead mt-5 max-w-md">{text}</p>
         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a href="/book-vikar" class="btn btn-primary">Book en vikar</a>
-          <a href="/kontakt" class="btn btn-secondary">Skriv til os</a>
+          <a href={withBase('/book-vikar')} class="btn btn-primary">Book en vikar</a>
+          <a href={withBase('/kontakt')} class="btn btn-secondary">Skriv til os</a>
         </div>
       </div>
 

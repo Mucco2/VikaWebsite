@@ -5,7 +5,7 @@ import Icon from '../components/Icon.astro';
 import Checklist from '../components/Checklist.astro';
 import Form from '../components/forms/Form.astro';
 import Field from '../components/forms/Field.astro';
-import { site } from '../config/site';
+import { site, withBase } from '../config/site';
 import type { IconName } from '../lib/icons';
 
 const benefits: { icon: IconName; title: string; text: string }[] = [
@@ -131,7 +131,7 @@ const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
               />
               <label for="felt-samtykke" class="text-[0.95rem] text-muted">
                 Jeg giver samtykke til, at {site.name} opbevarer mine oplysninger og mit CV i forbindelse med min ansøgning,
-                jf. <a href="/privatlivspolitik" class="text-link font-medium">privatlivspolitikken</a>.
+                jf. <a href={withBase('/privatlivspolitik')} class="text-link font-medium">privatlivspolitikken</a>.
               </label>
             </div>
             <p id="felt-samtykke-fejl" class="field-error" data-error hidden></p>

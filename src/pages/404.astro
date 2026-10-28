@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../config/site';
 ---
 
 <BaseLayout title="Siden findes ikke" noindex>
@@ -9,8 +10,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h1 class="h2 mt-4">Vi kan ikke finde siden</h1>
       <p class="lead mt-5">Siden er måske flyttet eller findes ikke længere.</p>
       <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-        <a href="/" class="btn btn-primary">Gå til forsiden</a>
-        <a href="/kontakt" class="btn btn-secondary">Kontakt os</a>
+        <a href={withBase('/')} class="btn btn-primary">Gå til forsiden</a>
+        <a href={withBase('/kontakt')} class="btn btn-secondary">Kontakt os</a>
       </div>
     </div>
   </section>
