@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Form from '../components/forms/Form.astro';
+import Field from '../components/forms/Field.astro';
+import { site, bookableRoles, phoneHref } from '../config/site';
+
+const nextSteps = [
+  'Vi kontakter jer hurtigt for at afklare behovet.',
+  'Vi finder en vikar med den rette erfaring.',
+  'I får besked om, hvem der kommer, og hvornår.',
+];
+---
+
+<BaseLayout
+  title="Book en vikar"
+  description="Book en pædagogisk vikar online. Fortæl os, hvem I mangler og hvornår – så finder vi en screenet vikar, der passer til jeres institution."
+>
+  <PageHero
+    eyebrow="Book en vikar"
+    title="Fortæl os, hvem I mangler"
+    text="Udfyld formularen, så vender vi hurtigt tilbage med et forslag til en vikar."
+  />
+
+  <section class="section">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
+        <Form name="book-vikar" endpoint="booking" submitLabel="Send forespørgsel">
+          <Field label="Navn" name="navn" required autocomplete="name" />
+          <Field label="Institution" name="institution" required autocomplete="organization" />
+          <Field label="E-mail" name="email" type="email" required autocomplete="email" />
+          <Field
+            label="Telefon"
+            name="telefon"
+            type="tel"
+            required
+            autocomplete="tel"
+            pattern="^\+?[0-9\s\-]{8,16}$"
+            patternMessage="Indtast et gyldigt telefonnummer med mindst 8 cifre."
+          />
+          <Field label="Faggruppe" name="faggruppe" type="select" required options={bookableRoles} class="sm:col-span-2" />
+          <Field label="Startdato" name="startdato" type="date" required minToday />
+          <Field label="Slutdato" name="slutdato" type="date" minToday after="startdato" hint="Lad feltet stå tomt ved enkeltdage." />
+          <Field
+            label="Besked"
+            name="besked"
+            type="textarea"
+            class="sm:col-span-2"
+            placeholder="Fx målgruppe, mødetider, antal timer eller særlige behov"
+          />
+        </Form>
+      </div>
+
+      <aside class="space-y-6 lg:col-span-4" data-reveal>
+        <div class="rounded-2xl bg-brand-50 p-8">
+          <span class="icon-tile bg-white">
+            <Icon name="phone" />
+          </span>
+          <h2 class="h3 mt-6">Akut behov?</h2>
+          <p class="prose-text mt-2">Mangler I en vikar i dag eller i morgen, er det hurtigst at ringe.</p>
+          <a href={phoneHref} class="btn btn-primary mt-6 w-full">Ring {site.phone}</a>
+        </div>
+        <div class="p-2">
+          <h2 class="h3">Det sker der nu</h2>
+          <ol class="mt-5 space-y-4">
+            {
+              nextSteps.map((step, i) => (
+                <li class="flex gap-4">
+                  <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-brand-700 ring-1 ring-line">
+                    {i + 1}
+                  </span>
+                  <span class="prose-text pt-0.5">{step}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

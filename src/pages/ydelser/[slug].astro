@@ -1,0 +1,89 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Checklist from '../../components/Checklist.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import ContactSection from '../../components/ContactSection.astro';
+import { site, services, phoneHref, type Service } from '../../config/site';
+
+export const getStaticPaths = (() =>
+  services.map((service) => ({ params: { slug: service.slug }, props: { service } }))) satisfies GetStaticPaths;
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+const others = services.filter((s) => s.slug !== service.slug).slice(0, 3);
+---
+
+<BaseLayout title={service.title} description={service.metaDescription}>
+  <PageHero title={service.title} text={service.lead} crumbs={[{ label: 'Ydelser', href: '/ydelser' }]}>
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+      {
+        service.bookable ? (
+          <a href="/book-vikar" class="btn btn-primary">
+            Book en vikar
+            <Icon name="arrowRight" class="size-4" />
+          </a>
+        ) : (
+          <a href="/kontakt" class="btn btn-primary">
+            Kontakt os
+            <Icon name="arrowRight" class="size-4" />
+          </a>
+        )
+      }
+      <a href={phoneHref} class="btn btn-secondary">
+        <Icon name="phone" class="size-4 text-brand-600" />
+        Ring {site.phone}
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="space-y-6 lg:col-span-7" data-reveal>
+        <h2 class="h2">Sådan hjælper vi</h2>
+        {service.body.map((paragraph) => <p class="prose-text text-lg">{paragraph}</p>)}
+
+        <h3 class="h3 pt-6">Typiske arbejdssteder</h3>
+        <ul class="flex flex-wrap gap-2">
+          {
+            service.suitedFor.map((place) => (
+              <li class="rounded-full bg-white px-4 py-1.5 text-sm font-medium ring-1 ring-line">{place}</li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <aside class="lg:col-span-5" data-reveal>
+        <div class="card p-8 sm:p-10">
+          <span class="icon-tile">
+            <Icon name={service.icon} />
+          </span>
+          <h2 class="h3 mt-6">Det får I</h2>
+          <Checklist items={service.highlights} class="mt-6" />
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="border-t border-line bg-white py-20 sm:py-24" aria-labelledby="andre-titel">
+    <div class="container-page">
+      <h2 id="andre-titel" class="h2" data-reveal>Andre ydelser</h2>
+      <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          others.map((other) => (
+            <li data-reveal>
+              <ServiceCard service={other} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <ContactSection />
+</BaseLayout>

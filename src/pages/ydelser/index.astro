@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Checklist from '../../components/Checklist.astro';
+import ContactSection from '../../components/ContactSection.astro';
+import { services } from '../../config/site';
+---
+
+<BaseLayout
+  title="Ydelser"
+  description="Pædagoger, specialpædagoger og pædagogmedhjælpere som vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner – samt hjælp til lån."
+>
+  <PageHero
+    eyebrow="Ydelser"
+    title="Vikarer til hele det pædagogiske område"
+    text="Uanset om I mangler en ekstra hånd i morgen tidlig eller en fast vikar i flere måneder, finder vi en løsning, der passer til jeres hverdag."
+  />
+
+  <div class="container-page divide-y divide-line">
+    {
+      services.map((service) => (
+        <section id={service.slug} class="grid gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16" aria-labelledby={`${service.slug}-titel`}>
+          <div data-reveal>
+            <span class="icon-tile">
+              <Icon name={service.icon} />
+            </span>
+            <h2 id={`${service.slug}-titel`} class="h2 mt-6">
+              {service.title}
+            </h2>
+            <p class="lead mt-5">{service.lead}</p>
+            <a href={`/ydelser/${service.slug}`} class="btn btn-secondary mt-8">
+              Læs mere om {service.title.toLowerCase()}
+              <Icon name="arrowRight" class="size-4" />
+            </a>
+          </div>
+          <div class="card self-start p-8 sm:p-10" data-reveal>
+            <h3 class="h3">Det får I</h3>
+            <Checklist items={service.highlights} class="mt-6" />
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <ContactSection />
+</BaseLayout>

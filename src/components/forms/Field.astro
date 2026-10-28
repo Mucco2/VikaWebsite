@@ -1,0 +1,115 @@
+---
+/**
+ * Et formularfelt med label, hjælpetekst og plads til fejlbesked.
+ * Valideringen sker i src/scripts/forms.ts.
+ */
+interface Props {
+  label: string;
+  name: string;
+  type?: 'text' | 'email' | 'tel' | 'date' | 'select' | 'textarea' | 'file';
+  required?: boolean;
+  autocomplete?: string;
+  hint?: string;
+  placeholder?: string;
+  options?: string[];
+  rows?: number;
+  accept?: string;
+  pattern?: string;
+  patternMessage?: string;
+  /** Navnet på et andet dato-felt, som denne dato ikke må ligge før */
+  after?: string;
+  /** Sæt minimumsdato til i dag */
+  minToday?: boolean;
+  /** Maks. filstørrelse i MB (kun type="file") */
+  maxSizeMb?: number;
+  class?: string;
+}
+
+const {
+  label,
+  name,
+  type = 'text',
+  required = false,
+  autocomplete,
+  hint,
+  placeholder,
+  options = [],
+  rows = 5,
+  accept,
+  pattern,
+  patternMessage,
+  after,
+  minToday,
+  maxSizeMb,
+  class: className,
+} = Astro.props;
+
+const id = `felt-${name}`;
+const hintId = hint ? `${id}-hint` : undefined;
+const errorId = `${id}-fejl`;
+const describedBy = [hintId, errorId].filter(Boolean).join(' ');
+
+const shared = {
+  id,
+  name,
+  required,
+  autocomplete,
+  'aria-describedby': describedBy,
+};
+---
+
+<div class={className}>
+  <label for={id} class="field-label">
+    {label}
+    {!required && <span class="font-normal text-muted"> (valgfri)</span>}
+  </label>
+
+  {
+    type === 'select' ? (
+      <div class="relative">
+        <select {...shared} class="field-input appearance-none pr-11">
+          <option value="">Vælg …</option>
+          {options.map((option) => (
+            <option value={option}>{option}</option>
+          ))}
+        </select>
+        <svg
+          class="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </div>
+    ) : type === 'textarea' ? (
+      <textarea {...shared} rows={rows} placeholder={placeholder} class="field-input resize-y" />
+    ) : type === 'file' ? (
+      <input
+        {...shared}
+        type="file"
+        accept={accept}
+        data-max-size-mb={maxSizeMb}
+        class="field-input cursor-pointer py-2.5 text-sm text-muted file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100"
+      />
+    ) : (
+      <input
+        {...shared}
+        type={type}
+        placeholder={placeholder}
+        pattern={pattern}
+        data-pattern-message={patternMessage}
+        data-after={after ? `felt-${after}` : undefined}
+        data-min-today={minToday ? '' : undefined}
+        class="field-input"
+      />
+    )
+  }
+
+  {hint && <p id={hintId} class="field-hint">{hint}</p>}
+  <p id={errorId} class="field-error" data-error hidden></p>
+</div>

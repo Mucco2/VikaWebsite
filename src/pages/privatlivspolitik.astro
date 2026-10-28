@@ -1,0 +1,135 @@
+---
+/**
+ * SKABELON – gennemgå teksten og udfyld alle [PLADSHOLDERE], før siden går live.
+ * Teksten er en generel skabelon og ikke juridisk rådgivning.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { site, forms, phoneHref, emailHref } from '../config/site';
+
+const formProcessor =
+  forms.provider === 'netlify'
+    ? 'Netlify, Inc. (hosting og modtagelse af formularer)'
+    : 'Formspree, Inc. (modtagelse af formularer)';
+---
+
+<BaseLayout
+  title="Privatlivspolitik"
+  description={`Læs, hvordan ${site.name} indsamler, bruger og beskytter dine personoplysninger.`}
+>
+  <PageHero title="Privatlivspolitik" text="Sådan behandler vi dine personoplysninger." />
+
+  <section class="section">
+    <div class="container-page">
+      <article class="legal mx-auto max-w-3xl">
+        <p>
+          Hos {site.name} passer vi godt på dine personoplysninger. I denne privatlivspolitik kan du læse, hvilke oplysninger
+          vi behandler, hvorfor vi gør det, og hvilke rettigheder du har.
+        </p>
+
+        <h2>1. Dataansvarlig</h2>
+        <p>{site.name} er dataansvarlig for behandlingen af de personoplysninger, vi modtager om dig.</p>
+        <ul>
+          <li>Adresse: {site.address}</li>
+          <li>CVR: {site.cvr}</li>
+          <li>Telefon: <a href={phoneHref}>{site.phone}</a></li>
+          <li>E-mail: <a href={emailHref}>{site.email}</a></li>
+        </ul>
+
+        <h2>2. Hvilke oplysninger behandler vi?</h2>
+        <h3>Kunder og kontaktpersoner</h3>
+        <p>
+          Når du booker en vikar eller kontakter os, behandler vi dit navn, din institution, e-mail, telefonnummer og
+          de oplysninger, du selv skriver i din besked.
+        </p>
+        <h3>Ansøgere og vikarer</h3>
+        <p>
+          Når du søger job som vikar, behandler vi dit navn, kontaktoplysninger, uddannelse, erfaring, dit CV og andre
+          oplysninger, du sender til os. Bliver du ansat, behandler vi desuden oplysninger, der er nødvendige for
+          ansættelsen, fx CPR-nummer, kontonummer, børneattest og referencer. [TILPAS: tilføj evt. øvrige oplysninger]
+        </p>
+        <h3>Besøgende på hjemmesiden</h3>
+        <p>
+          Hjemmesiden bruger ikke cookies til statistik eller markedsføring. Vores hostingudbyder kan registrere tekniske
+          oplysninger som IP-adresse og browsertype i serverlogs af hensyn til sikkerhed og drift.
+        </p>
+
+        <h2>3. Formål og retsgrundlag</h2>
+        <ul>
+          <li>
+            <strong>Besvarelse af henvendelser og levering af vikarer</strong> – for at kunne indgå og opfylde en aftale med
+            dig eller din arbejdsgiver (databeskyttelsesforordningens art. 6, stk. 1, litra b og f).
+          </li>
+          <li>
+            <strong>Rekruttering</strong> – for at vurdere din ansøgning. Vi opbevarer dit CV på baggrund af dit samtykke (art.
+            6, stk. 1, litra a), som du til enhver tid kan trække tilbage.
+          </li>
+          <li>
+            <strong>Ansættelse</strong> – for at opfylde ansættelsesaftalen og vores retlige forpligtelser, fx løn, skat og
+            bogføring (art. 6, stk. 1, litra b og c, samt databeskyttelseslovens § 11 for CPR-nummer).
+          </li>
+          <li>
+            <strong>Børneattest</strong> – vi indhenter børneattest med dit samtykke, når det kræves efter reglerne om
+            børneattester ved arbejde med børn under 15 år.
+          </li>
+        </ul>
+
+        <h2>4. Hvor længe gemmer vi oplysningerne?</h2>
+        <ul>
+          <li>Henvendelser og bookinger: [ANTAL] måneder efter sidste kontakt.</li>
+          <li>Ansøgninger, der ikke fører til ansættelse: [ANTAL] måneder efter modtagelse, medmindre du giver samtykke til længere opbevaring.</li>
+          <li>Oplysninger om ansatte vikarer: [ANTAL] år efter ansættelsens ophør.</li>
+          <li>Bogføringsmateriale: 5 år efter regnskabsårets afslutning, jf. bogføringsloven.</li>
+        </ul>
+
+        <h2>5. Hvem deler vi oplysningerne med?</h2>
+        <p>
+          Vi videregiver kun oplysninger, når det er nødvendigt. Når du sendes ud som vikar, deler vi relevante oplysninger
+          med den institution, du skal arbejde hos. Vi bruger desuden udvalgte databehandlere, der behandler oplysninger
+          på vores vegne og efter vores instruks:
+        </p>
+        <ul>
+          <li>{formProcessor}</li>
+          <li>[TILPAS: e-mailudbyder, fx Microsoft eller Google]</li>
+          <li>[TILPAS: løn- og vagtplansystem]</li>
+        </ul>
+
+        <h2>6. Overførsel til lande uden for EU/EØS</h2>
+        <p>
+          Enkelte af vores databehandlere kan være placeret uden for EU/EØS, fx i USA. Overførsel sker kun på et lovligt
+          grundlag, fx EU-Kommissionens standardkontraktbestemmelser eller EU-U.S. Data Privacy Framework.
+          [TILPAS: bekræft grundlaget for jeres leverandører]
+        </p>
+
+        <h2>7. Cookies</h2>
+        <p>
+          Vi bruger ikke cookies til statistik, analyse eller markedsføring, og vi indlæser ikke indhold fra tredjeparter,
+          der sætter sådanne cookies. Derfor beder vi dig ikke om cookiesamtykke.
+        </p>
+
+        <h2>8. Dine rettigheder</h2>
+        <p>Du har efter databeskyttelsesforordningen en række rettigheder:</p>
+        <ul>
+          <li>Ret til indsigt i de oplysninger, vi behandler om dig</li>
+          <li>Ret til at få urigtige oplysninger berettiget</li>
+          <li>Ret til at få oplysninger slettet</li>
+          <li>Ret til at begrænse behandlingen</li>
+          <li>Ret til dataportabilitet</li>
+          <li>Ret til at gøre indsigelse mod behandlingen</li>
+          <li>Ret til at trække et samtykke tilbage – det påvirker ikke lovligheden af behandlingen, før du trak det tilbage</li>
+        </ul>
+        <p>Kontakt os på <a href={emailHref}>{site.email}</a>, hvis du vil gøre brug af dine rettigheder.</p>
+
+        <h2>9. Klage</h2>
+        <p>
+          Er du utilfreds med vores behandling af dine personoplysninger, kan du klage til Datatilsynet. Du finder
+          kontaktoplysninger på <a href="https://www.datatilsynet.dk" rel="noopener">datatilsynet.dk</a>.
+        </p>
+
+        <h2>10. Ændringer</h2>
+        <p>Vi kan opdatere denne privatlivspolitik. Den nyeste version findes altid på denne side.</p>
+        <p><em>Sidst opdateret: [DATO]</em></p>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Checklist from '../components/Checklist.astro';
+import Form from '../components/forms/Form.astro';
+import Field from '../components/forms/Field.astro';
+import { site } from '../config/site';
+import type { IconName } from '../lib/icons';
+
+const benefits: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'calendar', title: 'Fleksible vagter', text: 'Du fortæller, hvornår du kan arbejde – og vi finder vagter, der passer ind.' },
+  { icon: 'compass', title: 'Varierede arbejdspladser', text: 'Prøv kræfter med forskellige målgrupper, institutioner og pædagogiske tilgange.' },
+  { icon: 'repeat', title: 'Mulighed for faste forløb', text: 'Ønsker du stabilitet, kan du komme i længere vikariater på samme arbejdsplads.' },
+  { icon: 'users', title: 'Personlig kontakt', text: 'Du har en fast kontaktperson hos os, som kender dig og dine ønsker.' },
+  { icon: 'shield', title: 'Ordnede forhold', text: 'Klare aftaler, løn til tiden og en grundig introduktion, før du starter.' },
+  { icon: 'trendingUp', title: 'Erfaring og netværk', text: 'Byg din erfaring op og mød kommende arbejdsgivere i hele det pædagogiske felt.' },
+];
+
+const requirements = [
+  'Pædagogisk uddannelse eller relevant erfaring',
+  'Gyldig børneattest (vi indhenter den sammen med dig)',
+  'Pålidelighed, mødestabilitet og gode samarbejdsevner',
+  'Gode danskkundskaber i tale og skrift',
+];
+
+const educations = [
+  'Pædagog',
+  'Specialpædagog / PD i specialpædagogik',
+  'Pædagogisk assistent (PAU)',
+  'Pædagogstuderende',
+  'Lærer',
+  'Social- og sundhedsuddannelse',
+  'Anden uddannelse',
+  'Ingen relevant uddannelse',
+];
+
+const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
+---
+
+<BaseLayout
+  title="Bliv vikar"
+  description={`Bliv pædagogisk vikar hos ${site.name}. Fleksible vagter, varierede arbejdspladser og personlig kontakt. Send din ansøgning og dit CV i dag.`}
+>
+  <PageHero
+    eyebrow="Bliv vikar"
+    title="Arbejd fleksibelt – og gør en forskel hver dag"
+    text="Vi søger engagerede pædagoger, specialpædagoger og pædagogmedhjælpere, der vil være vikar i daginstitutioner, skoler, specialskoler og bosteder."
+  >
+    <a href="#ansoeg" class="btn btn-primary mt-9">
+      Send din ansøgning
+      <Icon name="arrowRight" class="size-4" />
+    </a>
+  </PageHero>
+
+  <section class="section" aria-labelledby="fordele-titel">
+    <div class="container-page">
+      <div class="max-w-2xl" data-reveal>
+        <p class="eyebrow">Fordele</p>
+        <h2 id="fordele-titel" class="h2 mt-3">Derfor er du vikar hos os</h2>
+      </div>
+      <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          benefits.map((benefit) => (
+            <li class="card p-7" data-reveal>
+              <span class="icon-tile">
+                <Icon name={benefit.icon} />
+              </span>
+              <h3 class="h3 mt-6">{benefit.title}</h3>
+              <p class="prose-text mt-3 text-[0.95rem]">{benefit.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section id="ansoeg" class="border-t border-line bg-white py-20 sm:py-28" aria-labelledby="ansoeg-titel">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Ansøgning</p>
+        <h2 id="ansoeg-titel" class="h2 mt-3">Send din ansøgning</h2>
+        <p class="prose-text mt-5">
+          Udfyld formularen og vedhæft gerne dit CV. Vi kontakter dig for en uformel samtale.
+        </p>
+        <h3 class="h3 mt-10">Det søger vi</h3>
+        <Checklist items={requirements} class="mt-5 text-[0.95rem]" />
+      </div>
+
+      <div class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
+        <Form name="bliv-vikar" endpoint="application" submitLabel="Send ansøgning" files>
+          <Field label="Navn" name="navn" required autocomplete="name" class="sm:col-span-2" />
+          <Field label="E-mail" name="email" type="email" required autocomplete="email" />
+          <Field
+            label="Telefon"
+            name="telefon"
+            type="tel"
+            required
+            autocomplete="tel"
+            pattern="^\+?[0-9\s\-]{8,16}$"
+            patternMessage="Indtast et gyldigt telefonnummer med mindst 8 cifre."
+          />
+          <Field label="Uddannelse" name="uddannelse" type="select" required options={educations} />
+          <Field label="Erfaring" name="erfaring" type="select" required options={experience} />
+          <Field
+            label="Fortæl kort om dig selv"
+            name="om-dig"
+            type="textarea"
+            class="sm:col-span-2"
+            placeholder="Fx tidligere arbejdspladser, målgrupper og hvornår du kan arbejde"
+          />
+          <Field
+            label="CV"
+            name="cv"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            maxSizeMb={5}
+            hint="PDF eller Word. Maks. 5 MB."
+            class="sm:col-span-2"
+          />
+          <div class="sm:col-span-2">
+            <div class="flex items-start gap-3">
+              <input
+                id="felt-samtykke"
+                name="samtykke"
+                type="checkbox"
+                value="ja"
+                required
+                aria-describedby="felt-samtykke-fejl"
+                class="mt-0.5 size-5 shrink-0 cursor-pointer rounded border-line accent-brand-600"
+              />
+              <label for="felt-samtykke" class="text-[0.95rem] text-muted">
+                Jeg giver samtykke til, at {site.name} opbevarer mine oplysninger og mit CV i forbindelse med min ansøgning,
+                jf. <a href="/privatlivspolitik" class="text-link font-medium">privatlivspolitikken</a>.
+              </label>
+            </div>
+            <p id="felt-samtykke-fejl" class="field-error" data-error hidden></p>
+          </div>
+        </Form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

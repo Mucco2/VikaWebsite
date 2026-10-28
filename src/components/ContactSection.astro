@@ -1,0 +1,63 @@
+---
+import Icon from './Icon.astro';
+import { site, phoneHref, emailHref } from '../config/site';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+
+const {
+  title = 'Mangler I en vikar?',
+  text = 'Ring til os, eller send en forespørgsel. Vi vender hurtigt tilbage – og finder en vikar, der passer til jer.',
+} = Astro.props;
+
+const items = [
+  { icon: 'phone', label: 'Telefon', value: site.phone, href: phoneHref },
+  { icon: 'mail', label: 'E-mail', value: site.email, href: emailHref },
+  { icon: 'mapPin', label: 'Adresse', value: site.address },
+] as const;
+---
+
+<section class="section" aria-labelledby="kontakt-titel">
+  <div class="container-page">
+    <div class="grid gap-12 rounded-3xl bg-brand-50 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-2 lg:gap-16" data-reveal>
+      <div>
+        <p class="eyebrow">Kontakt</p>
+        <h2 id="kontakt-titel" class="h2 mt-3">{title}</h2>
+        <p class="lead mt-5 max-w-md">{text}</p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="/book-vikar" class="btn btn-primary">Book en vikar</a>
+          <a href="/kontakt" class="btn btn-secondary">Skriv til os</a>
+        </div>
+      </div>
+
+      <ul class="grid content-center gap-3">
+        {
+          items.map((item) => {
+            const Tag = 'href' in item ? 'a' : 'div';
+            return (
+              <li>
+                <Tag
+                  href={'href' in item ? item.href : undefined}
+                  class:list={[
+                    'flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-line',
+                    'href' in item && 'transition-colors hover:ring-brand-300',
+                  ]}
+                >
+                  <span class="icon-tile">
+                    <Icon name={item.icon} />
+                  </span>
+                  <span>
+                    <span class="block text-sm text-muted">{item.label}</span>
+                    <span class="block font-semibold text-ink">{item.value}</span>
+                  </span>
+                </Tag>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</section>

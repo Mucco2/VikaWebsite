@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site, phoneHref } from '../config/site';
+---
+
+<BaseLayout title="Tak for din henvendelse" noindex>
+  <section class="container-page flex min-h-[60vh] items-center py-20">
+    <div class="mx-auto max-w-xl text-center" data-reveal>
+      <span class="mx-auto inline-flex size-16 items-center justify-center rounded-full bg-brand-600 text-white">
+        <Icon name="check" class="size-8" strokeWidth={2.25} />
+      </span>
+      <h1 class="h2 mt-8">Tak – vi har modtaget din henvendelse</h1>
+      <p class="lead mt-5">
+        Vi vender tilbage hurtigst muligt. Haster det, er du velkommen til at ringe på
+        <a href={phoneHref} class="text-link">{site.phone}</a>.
+      </p>
+      <a href="/" class="btn btn-secondary mt-10">Tilbage til forsiden</a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,23 @@
+---
+import Icon from './Icon.astro';
+import type { Service } from '../config/site';
+
+interface Props {
+  service: Service;
+}
+
+const { service } = Astro.props;
+---
+
+<a
+  href={`/ydelser/${service.slug}`}
+  class="card group flex h-full flex-col p-7 transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
+>
+  <span class="icon-tile"><Icon name={service.icon} /></span>
+  <h3 class="h3 mt-6">{service.title}</h3>
+  <p class="prose-text mt-3 flex-1 text-[0.95rem]">{service.short}</p>
+  <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+    Læs mere
+    <Icon name="arrowRight" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+  </span>
+</a>

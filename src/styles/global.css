@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+
+/* Farver og skrifttype – ret primærfarven her (brand-600 er den primære) */
+@theme {
+  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-brand-50: #f2f7f5;
+  --color-brand-100: #e3eee9;
+  --color-brand-200: #c6dcd3;
+  --color-brand-300: #9cc1b3;
+  --color-brand-400: #6a9d8b;
+  --color-brand-500: #4a8070;
+  --color-brand-600: #2f6b5e;
+  --color-brand-700: #27584d;
+  --color-brand-800: #20463e;
+  --color-brand-900: #1a3832;
+
+  --color-ink: #1c2321;
+  --color-muted: #5b6360;
+  --color-line: #e6e8e5;
+  --color-canvas: #fafaf8;
+  --color-danger: #b42318;
+
+  --shadow-soft: 0 1px 2px rgb(16 24 20 / 0.04), 0 10px 30px -14px rgb(16 24 20 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(16 24 20 / 0.04), 0 18px 40px -18px rgb(16 24 20 / 0.2);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  [id] {
+    scroll-margin-top: 6rem;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--color-brand-100);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+  }
+  .section {
+    @apply py-20 sm:py-28;
+  }
+  .eyebrow {
+    @apply text-sm font-semibold tracking-wide text-brand-600;
+  }
+  .h1 {
+    @apply text-[2.4rem] leading-[1.08] font-bold tracking-[-0.03em] text-balance sm:text-6xl;
+  }
+  .h2 {
+    @apply text-3xl leading-tight font-bold tracking-[-0.02em] text-balance sm:text-[2.6rem];
+  }
+  .h3 {
+    @apply text-lg font-semibold tracking-[-0.01em];
+  }
+  .lead {
+    @apply text-lg leading-relaxed text-pretty text-muted sm:text-xl;
+  }
+  .prose-text {
+    @apply leading-relaxed text-pretty text-muted;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.95rem] font-semibold transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply bg-brand-600 text-white hover:bg-brand-700;
+  }
+  .btn-secondary {
+    @apply bg-white text-ink ring-1 ring-line ring-inset hover:text-brand-700 hover:ring-brand-300;
+  }
+  .btn-sm {
+    @apply px-5 py-2.5 text-sm;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white shadow-soft ring-1 ring-line;
+  }
+  .icon-tile {
+    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600;
+  }
+  .text-link {
+    @apply font-semibold text-brand-600 underline decoration-brand-200 underline-offset-4 transition-colors hover:text-brand-700 hover:decoration-brand-600;
+  }
+
+  /* Lange tekster, fx privatlivspolitik */
+  .legal {
+    @apply leading-relaxed text-muted;
+  }
+  .legal > * + * {
+    @apply mt-5;
+  }
+  .legal h2 {
+    @apply mt-14 text-2xl font-bold tracking-[-0.02em] text-ink;
+  }
+  .legal h3 {
+    @apply mt-8 text-lg font-semibold text-ink;
+  }
+  .legal ul {
+    @apply list-disc space-y-2 pl-5 marker:text-brand-400;
+  }
+  .legal strong {
+    @apply font-semibold text-ink;
+  }
+  .legal a {
+    @apply font-medium text-brand-600 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-600;
+  }
+
+  /* Formularer */
+  .field-label {
+    @apply mb-2 block text-sm font-semibold text-ink;
+  }
+  .field-input {
+    @apply block w-full rounded-xl border border-line bg-white px-4 py-3 text-base text-ink transition-colors outline-none placeholder:text-muted/60 hover:border-brand-300 focus:border-brand-600 focus:ring-4 focus:ring-brand-100;
+  }
+  .field-input[aria-invalid='true'] {
+    @apply border-danger focus:ring-red-100;
+  }
+  .field-error {
+    @apply mt-2 text-sm font-medium text-danger;
+  }
+  .field-hint {
+    @apply mt-2 text-sm text-muted;
+  }
+}
+
+/* Blød fade-in ved scroll (kun når JS er slået til, og brugeren ikke har bedt om reduceret bevægelse) */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

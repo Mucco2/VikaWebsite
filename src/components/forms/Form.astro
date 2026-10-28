@@ -1,0 +1,64 @@
+---
+/**
+ * Fælles formular-wrapper. Kobles automatisk på Netlify Forms eller Formspree
+ * afhængigt af `forms.provider` i src/config/site.ts.
+ */
+import { forms } from '../../config/site';
+
+interface Props {
+  /** Formularens navn (vises i Netlify-dashboardet) */
+  name: string;
+  /** Hvilket Formspree-endpoint der skal bruges */
+  endpoint: keyof typeof forms.formspree;
+  submitLabel: string;
+  /** Sæt til true, hvis formularen indeholder filupload */
+  files?: boolean;
+}
+
+const { name, endpoint, submitLabel, files = false } = Astro.props;
+const isNetlify = forms.provider === 'netlify';
+const action = isNetlify ? forms.successPage : forms.formspree[endpoint];
+---
+
+<form
+  name={name}
+  method="POST"
+  action={action}
+  enctype={files ? 'multipart/form-data' : undefined}
+  novalidate
+  data-form
+  data-provider={forms.provider}
+  data-success={forms.successPage}
+  data-netlify={isNetlify ? 'true' : undefined}
+  netlify-honeypot={isNetlify ? 'bot-field' : undefined}
+>
+  {isNetlify && <input type="hidden" name="form-name" value={name} />}
+  <!-- Spamfælde: skjult for brugere -->
+  <p class="hidden" aria-hidden="true">
+    <label>
+      Udfyld ikke dette felt
+      <input name={isNetlify ? 'bot-field' : '_gotcha'} tabindex="-1" autocomplete="off" />
+    </label>
+  </p>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <slot />
+  </div>
+
+  <div data-form-status role="alert" class="mt-6 hidden rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-danger">
+  </div>
+
+  <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <button type="submit" class="btn btn-primary" data-submit>{submitLabel}</button>
+    <p class="text-sm text-muted sm:max-w-xs sm:text-right">
+      Vi behandler dine oplysninger fortroligt. Læs vores <a href="/privatlivspolitik" class="text-link font-medium"
+        >privatlivspolitik</a
+      >.
+    </p>
+  </div>
+</form>
+
+<script>
+  import { initForms } from '../../scripts/forms';
+  initForms();
+</script>

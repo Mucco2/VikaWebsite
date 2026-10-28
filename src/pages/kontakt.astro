@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Form from '../components/forms/Form.astro';
+import Field from '../components/forms/Field.astro';
+import { site, phoneHref, emailHref } from '../config/site';
+
+const items = [
+  { icon: 'phone', label: 'Telefon', value: site.phone, href: phoneHref },
+  { icon: 'mail', label: 'E-mail', value: site.email, href: emailHref },
+  { icon: 'mapPin', label: 'Adresse', value: site.address },
+  { icon: 'building', label: 'CVR', value: site.cvr },
+] as const;
+---
+
+<BaseLayout
+  title="Kontakt"
+  description={`Kontakt ${site.name} på telefon ${site.phone} eller e-mail ${site.email}. Vi hjælper med pædagogiske vikarer og svarer hurtigt.`}
+>
+  <PageHero
+    eyebrow="Kontakt"
+    title="Vi er her, når I har brug for os"
+    text="Ring, skriv eller send en besked via formularen. Vi svarer så hurtigt som muligt."
+  />
+
+  <section class="section">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <ul class="grid content-start gap-3 lg:col-span-4" data-reveal>
+        {
+          items.map((item) => {
+            const Tag = 'href' in item ? 'a' : 'div';
+            return (
+              <li>
+                <Tag
+                  href={'href' in item ? item.href : undefined}
+                  class:list={[
+                    'flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-line',
+                    'href' in item && 'transition-colors hover:ring-brand-300',
+                  ]}
+                >
+                  <span class="icon-tile">
+                    <Icon name={item.icon} />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block text-sm text-muted">{item.label}</span>
+                    <span class="block font-semibold break-words text-ink">{item.value}</span>
+                  </span>
+                </Tag>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <div class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
+        <h2 class="h3 mb-8">Send os en besked</h2>
+        <Form name="kontakt" endpoint="contact" submitLabel="Send besked">
+          <Field label="Navn" name="navn" required autocomplete="name" />
+          <Field label="E-mail" name="email" type="email" required autocomplete="email" />
+          <Field
+            label="Telefon"
+            name="telefon"
+            type="tel"
+            autocomplete="tel"
+            pattern="^\+?[0-9\s\-]{8,16}$"
+            patternMessage="Indtast et gyldigt telefonnummer med mindst 8 cifre."
+          />
+          <Field label="Institution / virksomhed" name="institution" autocomplete="organization" />
+          <Field label="Besked" name="besked" type="textarea" required class="sm:col-span-2" />
+        </Form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

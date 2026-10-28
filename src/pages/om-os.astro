@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { site, customers } from '../config/site';
+import type { IconName } from '../lib/icons';
+
+const values: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: 'heart',
+    title: 'Tryghed',
+    text: 'Børn, unge og borgere skal mødes af trygge voksne. Derfor kender vi hver eneste vikar, vi sender ud.',
+  },
+  {
+    icon: 'compass',
+    title: 'Faglighed',
+    text: 'Vi matcher på uddannelse, erfaring og målgruppe – ikke bare på, hvem der er ledig.',
+  },
+  {
+    icon: 'clock',
+    title: 'Pålidelighed',
+    text: 'Når vi siger, at en vikar kommer, så kommer vikaren. Og vi følger op bagefter.',
+  },
+];
+
+const screening = [
+  { title: 'Personlig samtale', text: 'Alle vikarer møder os til en samtale om erfaring, motivation og faglighed.' },
+  { title: 'Referencer', text: 'Vi taler med tidligere arbejdsgivere, før en vikar kommer ud.' },
+  { title: 'Børneattest', text: 'Vi indhenter børneattest på alle vikarer, der arbejder med børn og unge.' },
+  { title: 'Løbende opfølgning', text: 'Vi spørger jer, hvordan det gik – og bruger det til at blive endnu bedre.' },
+];
+---
+
+<BaseLayout
+  title="Om os"
+  description={`Lær ${site.name} at kende. Vi leverer trygge, screenede pædagogiske vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner.`}
+>
+  <PageHero
+    eyebrow="Om os"
+    title="Vi gør det let at få den rette vikar"
+    text={`${site.name} er et vikarbureau med fokus på det pædagogiske område. Vi forbinder engagerede vikarer med institutioner, der har brug for en ekstra hånd.`}
+  />
+
+  <section class="section">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5" data-reveal>
+        <h2 class="h2">Hvorfor vi gør det</h2>
+      </div>
+      <div class="space-y-6 lg:col-span-7" data-reveal>
+        <p class="prose-text text-lg">
+          Når en medarbejder er væk, mærker børn, elever og borgere det først. Vi ved, hvor meget det betyder, at der står
+          en tryg og kompetent voksen klar – også med kort varsel.
+        </p>
+        <p class="prose-text text-lg">
+          Derfor bruger vi tid på at lære både vores vikarer og vores kunder at kende. Så kan vi sende den rette person
+          første gang og skabe kontinuitet, når I har brug for hjælp i længere tid.
+        </p>
+        <p class="prose-text text-lg">
+          Vi leverer til {customers.map((c) => c.toLowerCase()).join(', ').replace(/, ([^,]*)$/, ' og $1')}.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-line bg-white py-20 sm:py-28" aria-labelledby="vaerdier-titel">
+    <div class="container-page">
+      <div class="max-w-2xl" data-reveal>
+        <p class="eyebrow">Vores værdier</p>
+        <h2 id="vaerdier-titel" class="h2 mt-3">Det står vi for</h2>
+      </div>
+      <ul class="mt-12 grid gap-5 md:grid-cols-3">
+        {
+          values.map((value) => (
+            <li class="rounded-2xl bg-canvas p-8 ring-1 ring-line" data-reveal>
+              <span class="icon-tile bg-white">
+                <Icon name={value.icon} />
+              </span>
+              <h3 class="h3 mt-6">{value.title}</h3>
+              <p class="prose-text mt-3 text-[0.95rem]">{value.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="screening-titel">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5" data-reveal>
+        <p class="eyebrow">Screening</p>
+        <h2 id="screening-titel" class="h2 mt-3">Sådan sikrer vi kvaliteten</h2>
+        <p class="lead mt-5">Ingen vikar kommer ud hos jer uden at have været igennem vores screening.</p>
+      </div>
+      <ol class="grid gap-5 sm:grid-cols-2 lg:col-span-7">
+        {
+          screening.map((item, i) => (
+            <li class="card p-7" data-reveal>
+              <span class="text-sm font-semibold text-brand-600">0{i + 1}</span>
+              <h3 class="h3 mt-3">{item.title}</h3>
+              <p class="prose-text mt-3 text-[0.95rem]">{item.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <ContactSection title="Lad os tage en snak" text="Vil I høre mere om, hvordan vi kan hjælpe jer? Ring eller skriv – så tager vi en uforpligtende snak." />
+</BaseLayout>

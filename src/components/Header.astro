@@ -1,0 +1,111 @@
+---
+import Icon from './Icon.astro';
+import { site, nav, phoneHref } from '../config/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
+---
+
+<header class="sticky top-0 z-50 border-b border-line/70 bg-canvas/85 backdrop-blur-md">
+  <div class="container-page flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
+    <a href="/" class="text-[1.05rem] font-bold tracking-tight text-ink transition-colors hover:text-brand-700">
+      {site.name}
+    </a>
+
+    <nav aria-label="Hovedmenu" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class="rounded-full px-4 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:text-ink aria-[current=page]:text-brand-700"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={phoneHref} class="hidden items-center gap-2 px-3 text-sm font-semibold text-ink transition-colors hover:text-brand-700 xl:inline-flex">
+        <Icon name="phone" class="size-4 text-brand-600" />
+        {site.phone}
+      </a>
+      <a href="/book-vikar" class="btn btn-primary btn-sm hidden sm:inline-flex">Book vikar</a>
+      <button
+        type="button"
+        class="-mr-2 inline-flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-brand-50 lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobilmenu"
+        data-menu-toggle
+      >
+        <span class="sr-only" data-menu-label>Åbn menu</span>
+        <Icon name="menu" class="size-6" data-icon-open />
+        <Icon name="close" class="hidden size-6" data-icon-close />
+      </button>
+    </div>
+  </div>
+
+  <div id="mobilmenu" class="border-t border-line/70 lg:hidden" hidden>
+    <nav aria-label="Mobilmenu" class="container-page py-4">
+      <ul class="flex flex-col">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class="block border-b border-line/70 py-4 text-lg font-semibold text-ink aria-[current=page]:text-brand-700"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="flex flex-col gap-3 pt-6 pb-2 sm:flex-row">
+        <a href="/book-vikar" class="btn btn-primary">Book en vikar</a>
+        <a href={phoneHref} class="btn btn-secondary">
+          <Icon name="phone" class="size-4 text-brand-600" />
+          Ring {site.phone}
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.getElementById('mobilmenu');
+
+  if (toggle && menu) {
+    const label = toggle.querySelector('[data-menu-label]');
+    const iconOpen = toggle.querySelector('[data-icon-open]');
+    const iconClose = toggle.querySelector('[data-icon-close]');
+
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (label) label.textContent = open ? 'Luk menu' : 'Åbn menu';
+      iconOpen?.classList.toggle('hidden', open);
+      iconClose?.classList.toggle('hidden', !open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>
