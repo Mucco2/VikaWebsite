@@ -5,8 +5,11 @@ import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import Checklist from '../../components/Checklist.astro';
 import ServiceCard from '../../components/ServiceCard.astro';
+import CustomerCard from '../../components/CustomerCard.astro';
+import Steps from '../../components/Steps.astro';
+import FaqList from '../../components/FaqList.astro';
 import ContactSection from '../../components/ContactSection.astro';
-import { site, services, phoneHref, type Service, withBase } from '../../config/site';
+import { site, services, customerTypes, phoneHref, type Service, withBase } from '../../config/site';
 
 export const getStaticPaths = (() =>
   services.map((service) => ({ params: { slug: service.slug }, props: { service } }))) satisfies GetStaticPaths;
@@ -17,10 +20,27 @@ interface Props {
 
 const { service } = Astro.props;
 const others = services.filter((s) => s.slug !== service.slug).slice(0, 3);
+const relevantCustomers = customerTypes.filter((c) => c.services.includes(service.slug)).slice(0, 3);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.title,
+  description: service.metaDescription,
+  serviceType: `Vikarer – ${service.title.toLowerCase()}`,
+  areaServed: 'DK',
+  provider: { '@type': 'EmploymentAgency', name: site.name, url: site.url },
+};
 ---
 
-<BaseLayout title={service.title} description={service.metaDescription}>
-  <PageHero title={service.title} text={service.lead} crumbs={[{ label: 'Ydelser', href: '/ydelser' }]}>
+<BaseLayout title={service.title} description={service.metaDescription} image={service.image} schema={schema}>
+  <PageHero
+    title={service.title}
+    text={service.lead}
+    crumbs={[{ label: 'Ydelser', href: '/ydelser' }]}
+    image={service.image}
+    imageAlt={service.imageAlt}
+  >
     <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
       {
         service.bookable ? (
@@ -59,16 +79,80 @@ const others = services.filter((s) => s.slug !== service.slug).slice(0, 3);
       </div>
 
       <aside class="lg:col-span-5" data-reveal>
-        <div class="card p-8 sm:p-10">
+        <div class="card p-8 sm:p-10 lg:sticky lg:top-28">
           <span class="icon-tile">
             <Icon name={service.icon} />
           </span>
           <h2 class="h3 mt-6">Det får I</h2>
           <Checklist items={service.highlights} class="mt-6" />
+          {
+            service.bookable && (
+              <a href={withBase('/book-vikar')} class="btn btn-primary mt-8 w-full">
+                Book {service.title.toLowerCase()}
+              </a>
+            )
+          }
         </div>
       </aside>
     </div>
   </section>
+
+  <section class="section border-y border-line bg-white" aria-labelledby="forloeb-titel">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center" data-reveal>
+        <p class="eyebrow">Forløbet</p>
+        <h2 id="forloeb-titel" class="h2 mt-3">Sådan kommer I i gang</h2>
+      </div>
+      <Steps
+        class="mt-16"
+        steps={[
+          { icon: 'message', title: 'Fortæl os om behovet', text: 'Ring eller book online. Fortæl, hvornår, hvor længe og hvem vikaren skal arbejde med.' },
+          { icon: 'search', title: 'Vi finder vikaren', text: `Vi matcher på erfaring og målgruppe og giver jer besked om, hvem der kommer.` },
+          { icon: 'doorIn', title: 'Vikaren møder ind', text: 'Vikaren møder forberedt ind til aftalt tid. Bagefter spørger vi, hvordan det gik.' },
+        ]}
+      />
+    </div>
+  </section>
+
+  {
+    relevantCustomers.length > 0 && (
+      <section class="section" aria-labelledby="kunder-titel">
+        <div class="container-page">
+          <h2 id="kunder-titel" class="h2" data-reveal>
+            Her arbejder vores {service.title.toLowerCase()}
+          </h2>
+          <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {relevantCustomers.map((customer) => (
+              <li data-reveal>
+                <CustomerCard customer={customer} class="h-full" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    service.faq.length > 0 && (
+      <section class:list={['section', relevantCustomers.length > 0 && 'pt-0 sm:pt-0']} aria-labelledby="faq-titel">
+        <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+          <div class="lg:col-span-4" data-reveal>
+            <p class="eyebrow">Spørgsmål og svar</p>
+            <h2 id="faq-titel" class="h2 mt-3">
+              Om {service.title.toLowerCase()}
+            </h2>
+            <a href={withBase('/faq')} class="text-link mt-6 inline-block text-[0.95rem]">
+              Se alle spørgsmål
+            </a>
+          </div>
+          <div class="lg:col-span-8" data-reveal>
+            <FaqList items={service.faq} schema />
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="border-t border-line bg-white py-20 sm:py-24" aria-labelledby="andre-titel">
     <div class="container-page">

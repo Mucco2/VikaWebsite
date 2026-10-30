@@ -2,7 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
+import Img from '../../components/Img.astro';
 import Checklist from '../../components/Checklist.astro';
+import CtaBand from '../../components/CtaBand.astro';
 import ContactSection from '../../components/ContactSection.astro';
 import { services, withBase } from '../../config/site';
 ---
@@ -10,38 +12,82 @@ import { services, withBase } from '../../config/site';
 <BaseLayout
   title="Ydelser"
   description="Pædagoger, specialpædagoger og pædagogmedhjælpere som vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner – samt hjælp til lån."
+  image="service-paedagoger"
 >
   <PageHero
     eyebrow="Ydelser"
     title="Vikarer til hele det pædagogiske område"
     text="Uanset om I mangler en ekstra hånd i morgen tidlig eller en fast vikar i flere måneder, finder vi en løsning, der passer til jeres hverdag."
-  />
+  >
+    <nav aria-label="Ydelser på siden" class="mt-9">
+      <ul class="flex flex-wrap gap-2">
+        {
+          services.map((service) => (
+            <li>
+              <a
+                href={`#${service.slug}`}
+                class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:text-brand-700 hover:ring-brand-300"
+              >
+                <Icon name={service.icon} class="size-4 text-brand-600" />
+                {service.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </PageHero>
 
   <div class="container-page divide-y divide-line">
     {
-      services.map((service) => (
-        <section id={service.slug} class="grid gap-10 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16" aria-labelledby={`${service.slug}-titel`}>
-          <div data-reveal>
-            <span class="icon-tile">
+      services.map((service, i) => (
+        <section
+          id={service.slug}
+          class="grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-2 lg:gap-16"
+          aria-labelledby={`${service.slug}-titel`}
+        >
+          <div class:list={['relative', i % 2 === 1 && 'lg:order-2']} data-reveal>
+            <Img
+              name={service.image}
+              alt={service.imageAlt}
+              class="aspect-[4/3] w-full rounded-[2rem] object-cover shadow-soft"
+              sizes="(min-width: 1152px) 540px, (min-width: 1024px) 50vw, 100vw"
+            />
+            <span class="icon-tile absolute top-5 left-5 bg-white shadow-soft">
               <Icon name={service.icon} />
             </span>
-            <h2 id={`${service.slug}-titel`} class="h2 mt-6">
+          </div>
+          <div data-reveal>
+            <h2 id={`${service.slug}-titel`} class="h2">
               {service.title}
             </h2>
             <p class="lead mt-5">{service.lead}</p>
-            <a href={withBase(`/ydelser/${service.slug}`)} class="btn btn-secondary mt-8">
-              Læs mere om {service.title.toLowerCase()}
-              <Icon name="arrowRight" class="size-4" />
-            </a>
-          </div>
-          <div class="card self-start p-8 sm:p-10" data-reveal>
-            <h3 class="h3">Det får I</h3>
-            <Checklist items={service.highlights} class="mt-6" />
+            <Checklist items={service.highlights} class="mt-8" />
+            <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+              <a href={withBase(`/ydelser/${service.slug}`)} class="btn btn-primary">
+                Læs mere om {service.title.toLowerCase()}
+                <Icon name="arrowRight" class="size-4" />
+              </a>
+              {service.bookable && (
+                <a href={withBase('/book-vikar')} class="btn btn-secondary">
+                  Book en vikar
+                </a>
+              )}
+            </div>
           </div>
         </section>
       ))
     }
   </div>
+
+  <CtaBand
+    image="saadan-overlevering"
+    eyebrow="Sådan arbejder vi"
+    title="Den rette vikar starter med en god snak"
+    text="Vi spørger ind til jeres målgruppe, jeres rytme og jeres metoder – så vikaren møder forberedt ind."
+    primary={{ label: 'Se, hvordan vi arbejder', href: '/saadan-arbejder-vi' }}
+    secondary={{ label: 'Book en vikar', href: '/book-vikar' }}
+  />
 
   <ContactSection />
 </BaseLayout>

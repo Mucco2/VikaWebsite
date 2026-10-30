@@ -2,10 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import Img from '../components/Img.astro';
 import Checklist from '../components/Checklist.astro';
+import BackgroundVideo from '../components/BackgroundVideo.astro';
+import Steps from '../components/Steps.astro';
+import FaqList from '../components/FaqList.astro';
+import ArticleCard from '../components/ArticleCard.astro';
 import Form from '../components/forms/Form.astro';
 import Field from '../components/forms/Field.astro';
-import { site, withBase } from '../config/site';
+import { site, faqs, media, withBase } from '../config/site';
+import { getArticles } from '../lib/articles';
 import type { IconName } from '../lib/icons';
 
 const benefits: { icon: IconName; title: string; text: string }[] = [
@@ -16,6 +22,15 @@ const benefits: { icon: IconName; title: string; text: string }[] = [
   { icon: 'shield', title: 'Ordnede forhold', text: 'Klare aftaler, løn til tiden og en grundig introduktion, før du starter.' },
   { icon: 'trendingUp', title: 'Erfaring og netværk', text: 'Byg din erfaring op og mød kommende arbejdsgivere i hele det pædagogiske felt.' },
 ];
+
+const steps: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'upload', title: 'Send ansøgning', text: 'Udfyld formularen herunder og vedhæft gerne dit CV. Det tager kun et par minutter.' },
+  { icon: 'message', title: 'Samtale', text: 'Vi ringer dig op og aftaler en uformel samtale om dig, din erfaring og dine ønsker.' },
+  { icon: 'fileCheck', title: 'Referencer og attest', text: 'Vi taler med dine referencer og indhenter børneattest – med dit samtykke via MitID.' },
+  { icon: 'sun', title: 'Første vagt', text: 'Du får en introduktion og tilbudt de første vagter, der passer til dig.' },
+];
+
+const roles = ['Pædagoger', 'Specialpædagoger', 'Pædagogiske assistenter (PAU)', 'Pædagogstuderende', 'Pædagogmedhjælpere'];
 
 const requirements = [
   'Pædagogisk uddannelse eller relevant erfaring',
@@ -36,23 +51,36 @@ const educations = [
 ];
 
 const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
+
+const articles = (await getArticles()).filter((a) => a.data.audience === 'vikarer').slice(0, 3);
 ---
 
 <BaseLayout
   title="Bliv vikar"
   description={`Bliv pædagogisk vikar hos ${site.name}. Fleksible vagter, varierede arbejdspladser og personlig kontakt. Send din ansøgning og dit CV i dag.`}
+  image="bliv-vikar"
 >
   <PageHero
     eyebrow="Bliv vikar"
     title="Arbejd fleksibelt – og gør en forskel hver dag"
     text="Vi søger engagerede pædagoger, specialpædagoger og pædagogmedhjælpere, der vil være vikar i daginstitutioner, skoler, specialskoler og bosteder."
   >
-    <a href="#ansoeg" class="btn btn-primary mt-9">
-      Send din ansøgning
-      <Icon name="arrowRight" class="size-4" />
-    </a>
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+      <a href="#ansoeg" class="btn btn-primary">
+        Send din ansøgning
+        <Icon name="arrowRight" class="size-4" />
+      </a>
+      <a href="#saadan" class="btn btn-secondary">Sådan bliver du vikar</a>
+    </div>
+    <BackgroundVideo
+      slot="media"
+      video={media.recruitVideo}
+      poster={media.recruitPoster}
+      class="aspect-[4/3] rounded-[2rem] shadow-lift"
+    />
   </PageHero>
 
+  <!-- Fordele -->
   <section class="section" aria-labelledby="fordele-titel">
     <div class="container-page">
       <div class="max-w-2xl" data-reveal>
@@ -75,6 +103,45 @@ const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
     </div>
   </section>
 
+  <!-- Sådan bliver du vikar -->
+  <section id="saadan" class="section border-y border-line bg-white" aria-labelledby="saadan-titel">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center" data-reveal>
+        <p class="eyebrow">Fra ansøgning til første vagt</p>
+        <h2 id="saadan-titel" class="h2 mt-3">Sådan bliver du vikar</h2>
+      </div>
+      <Steps steps={steps} class="mt-16" />
+    </div>
+  </section>
+
+  <!-- Hvem søger vi -->
+  <section class="section" aria-labelledby="hvem-titel">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div class="relative" data-reveal>
+        <Img
+          name="bliv-vikar"
+          alt="Smilende pædagog på hug ved en pige, der maler ved et staffeli udenfor"
+          class="aspect-[4/3] w-full rounded-[2rem] object-cover shadow-soft"
+          sizes="(min-width: 1152px) 540px, (min-width: 1024px) 50vw, 100vw"
+        />
+      </div>
+      <div data-reveal>
+        <p class="eyebrow">Hvem søger vi</p>
+        <h2 id="hvem-titel" class="h2 mt-3">Vi søger dig, der brænder for det pædagogiske arbejde</h2>
+        <ul class="mt-8 flex flex-wrap gap-2">
+          {
+            roles.map((role) => (
+              <li class="rounded-full bg-white px-4 py-1.5 text-sm font-medium ring-1 ring-line">{role}</li>
+            ))
+          }
+        </ul>
+        <h3 class="h3 mt-10">Det forventer vi</h3>
+        <Checklist items={requirements} class="mt-5" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Ansøgning -->
   <section id="ansoeg" class="border-t border-line bg-white py-20 sm:py-28" aria-labelledby="ansoeg-titel">
     <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
       <div class="lg:col-span-4" data-reveal>
@@ -83,8 +150,15 @@ const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
         <p class="prose-text mt-5">
           Udfyld formularen og vedhæft gerne dit CV. Vi kontakter dig for en uformel samtale.
         </p>
-        <h3 class="h3 mt-10">Det søger vi</h3>
-        <Checklist items={requirements} class="mt-5 text-[0.95rem]" />
+        <div class="mt-10 hidden overflow-hidden rounded-2xl lg:block">
+          <Img
+            name="bliv-vikar-2"
+            alt=""
+            class="aspect-[4/5] w-full object-cover"
+            sizes="360px"
+            widths={[400, 720]}
+          />
+        </div>
       </div>
 
       <div class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
@@ -140,4 +214,45 @@ const experience = ['Under 1 år', '1–3 år', '3–5 år', 'Over 5 år'];
       </div>
     </div>
   </section>
+
+  <!-- FAQ -->
+  <section class="section" aria-labelledby="faq-titel">
+    <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Spørgsmål og svar</p>
+        <h2 id="faq-titel" class="h2 mt-3">Det spørger vikarer ofte om</h2>
+        <a href={withBase('/faq#vikarer')} class="text-link mt-6 inline-block text-[0.95rem]">Se alle spørgsmål</a>
+      </div>
+      <div class="lg:col-span-8" data-reveal>
+        <FaqList items={faqs.vikarer} openFirst />
+      </div>
+    </div>
+  </section>
+
+  {
+    articles.length > 0 && (
+      <section class="section border-t border-line bg-white" aria-labelledby="raad-titel">
+        <div class="container-page">
+          <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div class="max-w-2xl" data-reveal>
+              <p class="eyebrow">Viden</p>
+              <h2 id="raad-titel" class="h2 mt-3">
+                Gode råd til dig som vikar
+              </h2>
+            </div>
+            <a href={withBase('/viden?for=vikarer')} class="text-link shrink-0 text-[0.95rem]" data-reveal>
+              Se alle artikler
+            </a>
+          </div>
+          <ul class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <li data-reveal>
+                <ArticleCard article={article} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>

@@ -1,0 +1,25 @@
+---
+import { site } from '../config/site';
+
+interface Props {
+  class?: string;
+  /** Hvid udgave til mørk baggrund */
+  inverted?: boolean;
+}
+
+const { class: className, inverted = false } = Astro.props;
+---
+
+<span class:list={['inline-flex items-center gap-2.5', className]}>
+  <svg viewBox="0 0 32 32" class="size-8 shrink-0" aria-hidden="true">
+    <rect width="32" height="32" rx="9" fill={inverted ? '#ffffff' : '#2f6b5e'}></rect>
+    <path
+      d="M9 10.5 16 22l7-11.5"
+      fill="none"
+      stroke={inverted ? '#2f6b5e' : '#ffffff'}
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"></path>
+  </svg>
+  <span class="text-[1.05rem] font-bold tracking-tight">{site.name}</span>
+</span>

@@ -1,0 +1,51 @@
+---
+/**
+ * Bred sektion med billede i baggrunden, overskrift og knapper.
+ */
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+import { withBase } from '../config/site';
+
+interface Props {
+  image: string;
+  eyebrow?: string;
+  title: string;
+  text?: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+}
+
+const { image, eyebrow, title, text, primary, secondary } = Astro.props;
+---
+
+<section class="py-6 sm:py-10">
+  <div class="container-page">
+    <div class="relative isolate overflow-hidden rounded-3xl bg-brand-900" data-reveal>
+      <Img
+        name={image}
+        alt=""
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+        sizes="(min-width: 1152px) 1152px, 100vw"
+      />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 via-brand-900/80 to-brand-900/30"></div>
+      <div class="max-w-xl px-6 py-16 sm:px-12 sm:py-24">
+        {eyebrow && <p class="text-sm font-semibold tracking-wide text-brand-200">{eyebrow}</p>}
+        <h2 class="h2 mt-3 text-white">{title}</h2>
+        {text && <p class="mt-5 text-lg leading-relaxed text-pretty text-white/85">{text}</p>}
+        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+          <a href={withBase(primary.href)} class="btn bg-white text-brand-800 hover:bg-brand-50">
+            {primary.label}
+            <Icon name="arrowRight" class="size-4" />
+          </a>
+          {
+            secondary && (
+              <a href={withBase(secondary.href)} class="btn text-white ring-1 ring-white/40 ring-inset hover:bg-white/10">
+                {secondary.label}
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,121 @@
+---
+/**
+ * Lydløs baggrundsvideo, der kører i loop.
+ * - Starter først, når den er synlig, og pauser, når man scroller forbi.
+ * - Starter ikke af sig selv, hvis brugeren har bedt om "reducér bevægelse".
+ * - Har altid en pause/afspil-knap (krav i WCAG 2.2.2).
+ * Videofilerne ligger i public/videos/ (mp4 og evt. webm).
+ */
+import fs from 'node:fs';
+import { getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { images } from '../lib/images';
+import { withBase } from '../config/site';
+
+interface Props {
+  /** Filnavn uden endelse i public/videos/, fx 'hero' */
+  video: string;
+  /** Plakatbillede i src/assets/images/ (vises før videoen starter) */
+  poster?: string;
+  class?: string;
+}
+
+const { video, poster, class: className } = Astro.props;
+
+const posterImage = poster ? images[poster] : undefined;
+const posterSrc = posterImage ? (await getImage({ src: posterImage, width: 1280, format: 'webp' })).src : undefined;
+const hasWebm = fs.existsSync(`public/videos/${video}.webm`);
+const hasMp4 = fs.existsSync(`public/videos/${video}.mp4`);
+---
+
+<div class:list={['relative isolate overflow-hidden bg-brand-100', className]} data-bg-video>
+  {
+    hasMp4 ? (
+      <video
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster={posterSrc}
+        aria-hidden="true"
+        tabindex="-1"
+        disablepictureinpicture
+      >
+        {hasWebm && <source src={withBase(`/videos/${video}.webm`)} type="video/webm" />}
+        <source src={withBase(`/videos/${video}.mp4`)} type="video/mp4" />
+      </video>
+    ) : (
+      posterSrc && <img src={posterSrc} alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+    )
+  }
+  <slot />
+  {
+    hasMp4 && (
+      <button
+        type="button"
+        class="absolute right-3 bottom-3 z-10 inline-flex size-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+        data-video-toggle
+        aria-label="Sæt video på pause"
+        hidden
+      >
+        <Icon name="pause" class="size-4" data-icon-pause />
+        <Icon name="play" class="hidden size-4" data-icon-play />
+      </button>
+    )
+  }
+</div>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-bg-video]').forEach((wrap) => {
+    const video = wrap.querySelector('video');
+    const button = wrap.querySelector<HTMLButtonElement>('[data-video-toggle]');
+    if (!video || !button) return;
+
+    let pausedByUser = reduceMotion;
+    let visible = false;
+
+    const update = () => {
+      const playing = !video.paused;
+      button.setAttribute('aria-label', playing ? 'Sæt video på pause' : 'Afspil video');
+      button.querySelector('[data-icon-pause]')?.classList.toggle('hidden', !playing);
+      button.querySelector('[data-icon-play]')?.classList.toggle('hidden', playing);
+    };
+
+    const play = () => {
+      video.preload = 'auto';
+      video.play().catch(() => {});
+    };
+
+    video.addEventListener('play', update);
+    video.addEventListener('pause', update);
+    video.querySelectorAll('source').forEach((source) =>
+      source.addEventListener('error', () => {
+        // Kan videoen ikke indlæses, vises plakatbilledet bare – uden knap
+        if (!video.currentSrc || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) button.hidden = true;
+      }),
+    );
+
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      if (video.paused) {
+        pausedByUser = false;
+        play();
+      } else {
+        pausedByUser = true;
+        video.pause();
+      }
+    });
+
+    // Afspil kun, mens videoen er i billedet
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !pausedByUser) play();
+      else if (!visible) video.pause();
+    }).observe(wrap);
+
+    update();
+  });
+</script>

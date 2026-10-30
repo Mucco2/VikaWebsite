@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getArticles, audienceLabel } from '../../lib/articles';
+
+const articles = await getArticles();
+const [featured, ...rest] = articles;
+
+const filters = [
+  { value: 'alle', label: 'Alle artikler' },
+  ...Object.entries(audienceLabel).map(([value, label]) => ({ value, label })),
+];
+---
+
+<BaseLayout
+  title="Viden og gode råd"
+  description="Artikler og gode råd til institutioner og pædagogiske vikarer – om børneattester, overlevering, kontinuitet og den første vagt."
+  image="viden-tjekliste"
+>
+  <PageHero
+    eyebrow="Viden"
+    title="Gode råd fra hverdagen"
+    text="Praktiske artikler til jer, der tager imod vikarer – og til dig, der er vikar. Skrevet med udgangspunkt i det, vi oplever hver dag."
+  >
+    <div class="js-only mt-9 flex flex-wrap gap-2" role="group" aria-label="Filtrér artikler">
+      {
+        filters.map((filter, i) => (
+          <button
+            type="button"
+            class="rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:text-brand-700 hover:ring-brand-300 aria-pressed:bg-brand-600 aria-pressed:text-white aria-pressed:ring-brand-600"
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            data-filter={filter.value}
+          >
+            {filter.label}
+          </button>
+        ))
+      }
+    </div>
+  </PageHero>
+
+  <section class="section" aria-label="Artikler">
+    <div class="container-page">
+      {
+        articles.length === 0 ? (
+          <p class="lead">Der er ingen artikler endnu.</p>
+        ) : (
+          <ul class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" data-articles>
+            {featured && (
+              <li class="md:col-span-2 lg:col-span-3" data-audience={featured.data.audience} data-reveal>
+                <ArticleCard article={featured} featured headingLevel="h2" />
+              </li>
+            )}
+            {rest.map((article) => (
+              <li data-audience={article.data.audience} data-reveal>
+                <ArticleCard article={article} headingLevel="h2" />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <p class="lead mt-6 hidden" data-empty>Der er ingen artikler i denne kategori endnu.</p>
+    </div>
+  </section>
+
+  <CtaBand
+    image="skole-ude"
+    eyebrow="Har I brug for hjælp nu?"
+    title="Vi står klar, når en kollega mangler"
+    text="Ring eller book online – så finder vi en tryg og kompetent vikar til jer."
+    primary={{ label: 'Book en vikar', href: '/book-vikar' }}
+    secondary={{ label: 'Bliv vikar', href: '/bliv-vikar' }}
+  />
+</BaseLayout>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
+  const items = Array.from(document.querySelectorAll<HTMLElement>('[data-articles] > li'));
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+
+  const apply = (value: string) => {
+    let shown = 0;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === value)));
+    items.forEach((item) => {
+      const show = value === 'alle' || item.dataset.audience === value;
+      item.hidden = !show;
+      if (show) {
+        shown++;
+        item.classList.add('is-visible');
+      }
+    });
+    empty?.classList.toggle('hidden', shown > 0);
+    const url = new URL(window.location.href);
+    if (value === 'alle') url.searchParams.delete('for');
+    else url.searchParams.set('for', value);
+    history.replaceState(null, '', url);
+  };
+
+  buttons.forEach((button) => button.addEventListener('click', () => apply(button.dataset.filter || 'alle')));
+
+  const initial = new URLSearchParams(window.location.search).get('for');
+  if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial);
+</script>

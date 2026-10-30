@@ -2,8 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import Img from '../components/Img.astro';
+import VideoPlayer from '../components/VideoPlayer.astro';
+import CtaBand from '../components/CtaBand.astro';
 import ContactSection from '../components/ContactSection.astro';
-import { site, customers } from '../config/site';
+import { site, customers, media } from '../config/site';
 import type { IconName } from '../lib/icons';
 
 const values: { icon: IconName; title: string; text: string }[] = [
@@ -30,24 +33,31 @@ const screening = [
   { title: 'Børneattest', text: 'Vi indhenter børneattest på alle vikarer, der arbejder med børn og unge.' },
   { title: 'Løbende opfølgning', text: 'Vi spørger jer, hvordan det gik – og bruger det til at blive endnu bedre.' },
 ];
+
+const customerList = customers
+  .map((c) => c.toLowerCase())
+  .join(', ')
+  .replace(/, ([^,]*)$/, ' og $1');
 ---
 
 <BaseLayout
   title="Om os"
   description={`Lær ${site.name} at kende. Vi leverer trygge, screenede pædagogiske vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner.`}
+  image="om-os-team"
 >
   <PageHero
     eyebrow="Om os"
     title="Vi gør det let at få den rette vikar"
     text={`${site.name} er et vikarbureau med fokus på det pædagogiske område. Vi forbinder engagerede vikarer med institutioner, der har brug for en ekstra hånd.`}
+    image="om-os-team"
+    imageAlt="Tre kolleger, der holder møde i et lyst kontor"
   />
 
   <section class="section">
-    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <div class="lg:col-span-5" data-reveal>
-        <h2 class="h2">Hvorfor vi gør det</h2>
-      </div>
+    <div class="container-page grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
       <div class="space-y-6 lg:col-span-7" data-reveal>
+        <p class="eyebrow">Vores historie</p>
+        <h2 class="h2">Hvorfor vi gør det</h2>
         <p class="prose-text text-lg">
           Når en medarbejder er væk, mærker børn, elever og borgere det først. Vi ved, hvor meget det betyder, at der står
           en tryg og kompetent voksen klar – også med kort varsel.
@@ -56,9 +66,15 @@ const screening = [
           Derfor bruger vi tid på at lære både vores vikarer og vores kunder at kende. Så kan vi sende den rette person
           første gang og skabe kontinuitet, når I har brug for hjælp i længere tid.
         </p>
-        <p class="prose-text text-lg">
-          Vi leverer til {customers.map((c) => c.toLowerCase()).join(', ').replace(/, ([^,]*)$/, ' og $1')}.
-        </p>
+        <p class="prose-text text-lg">Vi leverer til {customerList}.</p>
+      </div>
+      <div class="lg:col-span-5" data-reveal>
+        <Img
+          name="om-os-samtale"
+          alt="To personer i en afslappet samtale over en kop kaffe ved et skrivebord"
+          class="aspect-[4/5] w-full rounded-[2rem] object-cover shadow-soft"
+          sizes="(min-width: 1024px) 440px, 100vw"
+        />
       </div>
     </div>
   </section>
@@ -106,5 +122,29 @@ const screening = [
     </div>
   </section>
 
-  <ContactSection title="Lad os tage en snak" text="Vil I høre mere om, hvordan vi kan hjælpe jer? Ring eller skriv – så tager vi en uforpligtende snak." />
+  <section class="bg-brand-900 py-20 text-white sm:py-28" aria-labelledby="film-titel">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5" data-reveal>
+        <p class="text-sm font-semibold tracking-wide text-brand-200">Film</p>
+        <h2 id="film-titel" class="h2 mt-3">Mød os på under et minut</h2>
+        <p class="mt-5 text-lg leading-relaxed text-pretty text-white/80">{media.filmDescription}</p>
+      </div>
+      <div class="lg:col-span-7" data-reveal>
+        <VideoPlayer video={media.film} poster={media.filmPoster} title={media.filmTitle} duration={media.filmDuration} />
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    image="cta-band"
+    eyebrow="Bliv en del af holdet"
+    title="Vi søger altid gode vikarer"
+    text="Er du pædagog, specialpædagog eller pædagogmedhjælper og vil du arbejde fleksibelt? Så hører vi gerne fra dig."
+    primary={{ label: 'Bliv vikar', href: '/bliv-vikar' }}
+  />
+
+  <ContactSection
+    title="Lad os tage en snak"
+    text="Vil I høre mere om, hvordan vi kan hjælpe jer? Ring eller skriv – så tager vi en uforpligtende snak."
+  />
 </BaseLayout>

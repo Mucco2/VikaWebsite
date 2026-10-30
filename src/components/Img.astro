@@ -1,0 +1,53 @@
+---
+/**
+ * Optimeret billede fra src/assets/images/ (AVIF/WebP i flere størrelser).
+ * Brug: <Img name="service-paedagoger" alt="…" class="aspect-[4/3] w-full object-cover" />
+ * Findes billedet ikke, vises en rolig farveflade i stedet.
+ */
+import { Picture } from 'astro:assets';
+import { images } from '../lib/images';
+
+interface Props {
+  name: string;
+  alt: string;
+  class?: string;
+  /** Hvor bredt billedet vises – hjælper browseren med at vælge den rette størrelse */
+  sizes?: string;
+  widths?: number[];
+  /** Sæt til true for billeder øverst på siden (indlæses med det samme) */
+  priority?: boolean;
+}
+
+const {
+  name,
+  alt,
+  class: className,
+  sizes = '(min-width: 1024px) 50vw, 100vw',
+  widths = [480, 800, 1200, 1600, 2000],
+  priority = false,
+} = Astro.props;
+
+const src = images[name];
+const usable = src ? widths.filter((w) => w <= src.width) : [];
+if (src && !usable.includes(src.width) && src.width < Math.max(...widths)) usable.push(src.width);
+---
+
+{
+  src ? (
+    <Picture
+      src={src}
+      alt={alt}
+      widths={usable}
+      sizes={sizes}
+      formats={['avif', 'webp']}
+      quality={72}
+      class={className}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : undefined}
+      decoding="async"
+      pictureAttributes={{ class: 'contents' }}
+    />
+  ) : (
+    <div class:list={[className, 'bg-brand-100']} role={alt ? 'img' : undefined} aria-label={alt || undefined} />
+  )
+}

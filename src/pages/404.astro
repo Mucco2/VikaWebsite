@@ -1,14 +1,41 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
 import { withBase } from '../config/site';
+
+const links = [
+  { label: 'Book en vikar', href: '/book-vikar' },
+  { label: 'Ydelser', href: '/ydelser' },
+  { label: 'Hvem vi hjælper', href: '/kunder' },
+  { label: 'Bliv vikar', href: '/bliv-vikar' },
+  { label: 'Viden', href: '/viden' },
+  { label: 'Kontakt', href: '/kontakt' },
+];
 ---
 
 <BaseLayout title="Siden findes ikke" noindex>
   <section class="container-page flex min-h-[60vh] items-center py-20">
     <div class="mx-auto max-w-xl text-center">
-      <p class="eyebrow">Fejl 404</p>
+      <span class="mx-auto inline-flex size-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+        <Icon name="compass" class="size-8" />
+      </span>
+      <p class="eyebrow mt-8">Fejl 404</p>
       <h1 class="h2 mt-4">Vi kan ikke finde siden</h1>
-      <p class="lead mt-5">Siden er måske flyttet eller findes ikke længere.</p>
+      <p class="lead mt-5">Siden er måske flyttet eller findes ikke længere. Prøv en af disse i stedet:</p>
+      <ul class="mt-8 flex flex-wrap justify-center gap-2">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={withBase(link.href)}
+                class="inline-flex rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:text-brand-700 hover:ring-brand-300"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
       <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
         <a href={withBase('/')} class="btn btn-primary">Gå til forsiden</a>
         <a href={withBase('/kontakt')} class="btn btn-secondary">Kontakt os</a>

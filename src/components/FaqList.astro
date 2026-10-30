@@ -1,0 +1,46 @@
+---
+/**
+ * Spørgsmål og svar som foldbare punkter (virker uden JavaScript).
+ * Sæt schema={true} på ÉN liste pr. side for at give Google FAQ-data.
+ */
+import Icon from './Icon.astro';
+import type { Faq } from '../config/site';
+
+interface Props {
+  items: Faq[];
+  schema?: boolean;
+  class?: string;
+  /** Åbn det første spørgsmål fra start */
+  openFirst?: boolean;
+}
+
+const { items, schema = false, class: className, openFirst = false } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
+---
+
+<div class:list={['divide-y divide-line overflow-hidden rounded-2xl bg-white ring-1 ring-line', className]}>
+  {
+    items.map((item, i) => (
+      <details class="group" open={openFirst && i === 0}>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-6 px-6 py-5 font-semibold text-ink transition-colors hover:text-brand-700 sm:px-8 sm:py-6 [&::-webkit-details-marker]:hidden">
+          <span>{item.q}</span>
+          <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition-transform duration-300 group-open:rotate-45">
+            <Icon name="plus" class="size-4" strokeWidth={2} />
+          </span>
+        </summary>
+        <p class="prose-text -mt-1 max-w-3xl px-6 pb-6 sm:px-8">{item.a}</p>
+      </details>
+    ))
+  }
+</div>
+
+{schema && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

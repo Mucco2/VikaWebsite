@@ -1,0 +1,54 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import { withBase } from '../config/site';
+import { audienceLabel, formatDate, readingTime, type Article } from '../lib/articles';
+
+interface Props {
+  article: Article;
+  /** Stort kort (fx den nyeste artikel) */
+  featured?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { article, featured = false, headingLevel: Heading = 'h3' } = Astro.props;
+const { title, description, date, image, audience } = article.data;
+---
+
+<a
+  href={withBase(`/viden/${article.id}`)}
+  class:list={[
+    'card group flex h-full flex-col overflow-hidden transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift',
+    featured && 'lg:flex-row',
+  ]}
+  data-audience={audience}
+>
+  <div class:list={['relative aspect-[16/10] shrink-0 overflow-hidden', featured && 'lg:aspect-auto lg:w-3/5']}>
+    <Picture
+      src={image}
+      alt=""
+      widths={featured ? [600, 900, 1300] : [400, 600, 900]}
+      sizes={featured ? '(min-width: 1024px) 690px, 100vw' : '(min-width: 1024px) 370px, (min-width: 640px) 50vw, 100vw'}
+      formats={['avif', 'webp']}
+      quality={72}
+      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+      pictureAttributes={{ class: 'contents' }}
+    />
+  </div>
+  <div class:list={['flex flex-1 flex-col p-7', featured && 'lg:justify-center lg:p-10']}>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+      <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">{audienceLabel[audience]}</span>
+      <time datetime={date.toISOString()}>{formatDate(date)}</time>
+    </p>
+    <Heading
+      class:list={['mt-4 font-semibold tracking-[-0.01em] text-balance', featured ? 'text-2xl sm:text-3xl' : 'text-lg']}
+    >
+      {title}
+    </Heading>
+    <p class="prose-text mt-3 flex-1 text-[0.95rem]">{description}</p>
+    <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+      Læs artiklen · {readingTime(article.body)} min.
+      <Icon name="arrowRight" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+    </span>
+  </div>
+</a>

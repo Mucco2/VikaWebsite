@@ -1,0 +1,143 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import Checklist from '../../components/Checklist.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import CustomerCard from '../../components/CustomerCard.astro';
+import Steps from '../../components/Steps.astro';
+import FaqList from '../../components/FaqList.astro';
+import ContactSection from '../../components/ContactSection.astro';
+import { site, services, customerTypes, phoneHref, type CustomerType, withBase } from '../../config/site';
+
+export const getStaticPaths = (() =>
+  customerTypes.map((customer) => ({ params: { slug: customer.slug }, props: { customer } }))) satisfies GetStaticPaths;
+
+interface Props {
+  customer: CustomerType;
+}
+
+const { customer } = Astro.props;
+const matchingServices = customer.services
+  .map((slug) => services.find((s) => s.slug === slug))
+  .filter((s): s is (typeof services)[number] => Boolean(s));
+const others = customerTypes.filter((c) => c.slug !== customer.slug).slice(0, 3);
+---
+
+<BaseLayout title={`Vikarer til ${customer.title.toLowerCase()}`} description={customer.metaDescription} image={customer.image}>
+  <PageHero
+    eyebrow={customer.title}
+    title={`Vikarer til ${customer.title.toLowerCase()}`}
+    text={customer.lead}
+    crumbs={[{ label: 'Hvem vi hjælper', href: '/kunder' }]}
+    image={customer.image}
+    imageAlt={customer.imageAlt}
+  >
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <a href={withBase('/book-vikar')} class="btn btn-primary">
+        Book en vikar
+        <Icon name="arrowRight" class="size-4" />
+      </a>
+      <a href={phoneHref} class="btn btn-secondary">
+        <Icon name="phone" class="size-4 text-brand-600" />
+        Ring {site.phone}
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="space-y-6 lg:col-span-7" data-reveal>
+        <h2 class="h2">Sådan hjælper vi {customer.title.toLowerCase()}</h2>
+        {customer.body.map((paragraph) => <p class="prose-text text-lg">{paragraph}</p>)}
+      </div>
+      <aside class="lg:col-span-5" data-reveal>
+        <div class="rounded-2xl bg-brand-50 p-8 sm:p-10">
+          <span class="icon-tile bg-white">
+            <Icon name={customer.icon} />
+          </span>
+          <h2 class="h3 mt-6">Typiske behov, vi hjælper med</h2>
+          <Checklist items={customer.needs} class="mt-6" />
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {
+    matchingServices.length > 0 && (
+      <section class="section border-y border-line bg-white" aria-labelledby="faggrupper-titel">
+        <div class="container-page">
+          <div class="max-w-2xl" data-reveal>
+            <p class="eyebrow">Faggrupper</p>
+            <h2 id="faggrupper-titel" class="h2 mt-3">
+              Det kan vi sende til jer
+            </h2>
+          </div>
+          <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {matchingServices.map((service) => (
+              <li data-reveal>
+                <ServiceCard service={service} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="forloeb-titel">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl text-center" data-reveal>
+        <p class="eyebrow">Sådan foregår det</p>
+        <h2 id="forloeb-titel" class="h2 mt-3">Fra opkald til vikar</h2>
+      </div>
+      <Steps
+        class="mt-16"
+        steps={[
+          { icon: 'message', title: 'Kontakt os', text: 'Ring eller book online. Fortæl, hvem I mangler, hvornår og hvor længe.' },
+          { icon: 'search', title: 'Vi matcher', text: 'Vi finder en vikar med erfaring fra lignende arbejdspladser og målgrupper.' },
+          { icon: 'doorIn', title: 'Vikaren møder ind', text: 'Vikaren møder forberedt ind til aftalt tid. Bagefter følger vi op.' },
+        ]}
+      />
+    </div>
+  </section>
+
+  {
+    customer.faq.length > 0 && (
+      <section class="section pt-0 sm:pt-0" aria-labelledby="faq-titel">
+        <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+          <div class="lg:col-span-4" data-reveal>
+            <p class="eyebrow">Spørgsmål og svar</p>
+            <h2 id="faq-titel" class="h2 mt-3">
+              Godt at vide
+            </h2>
+            <a href={withBase('/faq')} class="text-link mt-6 inline-block text-[0.95rem]">
+              Se alle spørgsmål
+            </a>
+          </div>
+          <div class="lg:col-span-8" data-reveal>
+            <FaqList items={customer.faq} schema />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="border-t border-line bg-white py-20 sm:py-24" aria-labelledby="andre-titel">
+    <div class="container-page">
+      <h2 id="andre-titel" class="h2" data-reveal>Vi hjælper også</h2>
+      <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          others.map((other) => (
+            <li data-reveal>
+              <CustomerCard customer={other} class="h-full" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <ContactSection />
+</BaseLayout>

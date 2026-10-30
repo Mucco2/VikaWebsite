@@ -1,44 +1,114 @@
 ---
 import Icon from './Icon.astro';
-import { site, nav, phoneHref, withBase } from '../config/site';
+import Logo from './Logo.astro';
+import { site, nav, phoneHref, emailHref, withBase } from '../config/site';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => path === withBase(href) || path.startsWith(`${withBase(href)}/`);
+const groupActive = (item: (typeof nav)[number]) =>
+  isActive(item.href) || Boolean(item.children?.some((child) => isActive(child.href)));
 ---
 
-<header class="sticky top-0 z-50 border-b border-line/70 bg-canvas/85 backdrop-blur-md">
+<!-- Topbjælke med telefon og e-mail (kun på større skærme) -->
+<div class="hidden bg-brand-800 text-sm text-white/90 sm:block">
+  <div class="container-page flex h-10 items-center justify-between gap-6">
+    <p class="truncate">
+      Akut behov for en vikar? Ring på
+      <a href={phoneHref} class="font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white"
+        >{site.phone}</a
+      >
+    </p>
+    <div class="flex shrink-0 items-center gap-6">
+      <a href={emailHref} class="hidden items-center gap-2 transition-colors hover:text-white md:inline-flex">
+        <Icon name="mail" class="size-4 text-brand-200" />
+        {site.email}
+      </a>
+      <a href={withBase('/bliv-vikar')} class="inline-flex items-center gap-1.5 font-semibold text-white transition-opacity hover:opacity-80">
+        Bliv vikar
+        <Icon name="arrowRight" class="size-3.5" />
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="sticky top-0 z-50 border-b border-line/70 bg-canvas/90 backdrop-blur-md">
   <div class="container-page flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
-    <a href={withBase('/')} class="text-[1.05rem] font-bold tracking-tight text-ink transition-colors hover:text-brand-700">
-      {site.name}
+    <a href={withBase('/')} class="text-ink transition-colors hover:text-brand-700" aria-label={`${site.name} – forside`}>
+      <Logo />
     </a>
 
-    <nav aria-label="Hovedmenu" class="hidden lg:block">
-      <ul class="flex items-center gap-1">
+    <nav aria-label="Hovedmenu" class="hidden xl:block">
+      <ul class="flex items-center gap-0.5">
         {
-          nav.map((item) => (
-            <li>
-              <a
-                href={withBase(item.href)}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-                class="rounded-full px-4 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:text-ink aria-[current=page]:text-brand-700"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
+          nav.map((item, i) =>
+            item.children ? (
+              <li class="relative" data-dropdown>
+                <button
+                  type="button"
+                  class:list={[
+                    'inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.95rem] font-medium transition-colors hover:text-ink',
+                    groupActive(item) ? 'text-brand-700' : 'text-muted',
+                  ]}
+                  aria-expanded="false"
+                  aria-controls={`undermenu-${i}`}
+                  data-dropdown-toggle
+                >
+                  {item.label}
+                  <Icon name="chevronDown" class="size-4 transition-transform duration-200" data-chevron />
+                </button>
+                <div id={`undermenu-${i}`} class="absolute top-full left-1/2 z-50 w-80 -translate-x-1/2 pt-3" hidden data-dropdown-panel>
+                  <div class="rounded-2xl bg-white p-2 shadow-lift ring-1 ring-line">
+                    <ul>
+                      {item.children.map((child) => (
+                        <li>
+                          <a
+                            href={withBase(child.href)}
+                            aria-current={path === withBase(child.href) ? 'page' : undefined}
+                            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.95rem] font-semibold text-ink transition-colors hover:bg-brand-50 aria-[current=page]:text-brand-700"
+                          >
+                            {child.icon && (
+                              <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                                <Icon name={child.icon} class="size-[1.1rem]" />
+                              </span>
+                            )}
+                            {child.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    {!item.children.some((child) => child.href === item.href) && (
+                      <a
+                        href={withBase(item.href)}
+                        class="mt-1 flex items-center justify-between rounded-xl border-t border-line px-3 pt-3.5 pb-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50"
+                      >
+                        Se alle {item.label.toLowerCase()}
+                        <Icon name="arrowRight" class="size-4" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={withBase(item.href)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  class="rounded-full px-3.5 py-2 text-[0.95rem] font-medium text-muted transition-colors hover:text-ink aria-[current=page]:text-brand-700"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
         }
       </ul>
     </nav>
 
     <div class="flex items-center gap-2">
-      <a href={phoneHref} class="hidden items-center gap-2 px-3 text-sm font-semibold text-ink transition-colors hover:text-brand-700 xl:inline-flex">
-        <Icon name="phone" class="size-4 text-brand-600" />
-        {site.phone}
-      </a>
       <a href={withBase('/book-vikar')} class="btn btn-primary btn-sm hidden sm:inline-flex">Book vikar</a>
       <button
         type="button"
-        class="-mr-2 inline-flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-brand-50 lg:hidden"
+        class="-mr-2 inline-flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-brand-50 xl:hidden"
         aria-expanded="false"
         aria-controls="mobilmenu"
         data-menu-toggle
@@ -50,21 +120,58 @@ const isActive = (href: string) => path === withBase(href) || path.startsWith(`$
     </div>
   </div>
 
-  <div id="mobilmenu" class="border-t border-line/70 lg:hidden" hidden>
+  <div id="mobilmenu" class="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-line/70 xl:hidden" hidden>
     <nav aria-label="Mobilmenu" class="container-page py-4">
       <ul class="flex flex-col">
         {
-          nav.map((item) => (
-            <li>
-              <a
-                href={withBase(item.href)}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-                class="block border-b border-line/70 py-4 text-lg font-semibold text-ink aria-[current=page]:text-brand-700"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
+          nav.map((item) =>
+            item.children ? (
+              <li class="border-b border-line/70">
+                <details class="group" open={groupActive(item)}>
+                  <summary class="flex cursor-pointer list-none items-center justify-between py-4 text-lg font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                    {item.label}
+                    <Icon name="chevronDown" class="size-5 text-muted transition-transform duration-200 group-open:rotate-180" />
+                  </summary>
+                  <ul class="space-y-1 pb-4">
+                    {item.children.map((child) => (
+                      <li>
+                        <a
+                          href={withBase(child.href)}
+                          aria-current={path === withBase(child.href) ? 'page' : undefined}
+                          class="flex items-center gap-3 rounded-xl px-2 py-2 font-medium text-muted aria-[current=page]:text-brand-700"
+                        >
+                          {child.icon && (
+                            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                              <Icon name={child.icon} class="size-4" />
+                            </span>
+                          )}
+                          {child.label}
+                        </a>
+                      </li>
+                    ))}
+                    {!item.children.some((child) => child.href === item.href) && (
+                      <li>
+                        <a href={withBase(item.href)} class="flex items-center gap-2 px-2 py-2 text-sm font-semibold text-brand-700">
+                          Se alle {item.label.toLowerCase()}
+                          <Icon name="arrowRight" class="size-4" />
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </details>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={withBase(item.href)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  class="block border-b border-line/70 py-4 text-lg font-semibold text-ink aria-[current=page]:text-brand-700"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
         }
       </ul>
       <div class="flex flex-col gap-3 pt-6 pb-2 sm:flex-row">
@@ -79,6 +186,7 @@ const isActive = (href: string) => path === withBase(href) || path.startsWith(`$
 </header>
 
 <script>
+  // ── Mobilmenu ──
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.getElementById('mobilmenu');
 
@@ -93,6 +201,7 @@ const isActive = (href: string) => path === withBase(href) || path.startsWith(`$
       if (label) label.textContent = open ? 'Luk menu' : 'Åbn menu';
       iconOpen?.classList.toggle('hidden', open);
       iconClose?.classList.toggle('hidden', !open);
+      document.documentElement.classList.toggle('menu-open', open);
     };
 
     toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
@@ -104,8 +213,60 @@ const isActive = (href: string) => path === withBase(href) || path.startsWith(`$
       }
     });
 
-    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+    window.matchMedia('(min-width: 1280px)').addEventListener('change', (event) => {
       if (event.matches) setOpen(false);
     });
   }
+
+  // ── Dropdowns i hovedmenuen (klik, tastatur og hover) ──
+  const dropdowns = Array.from(document.querySelectorAll<HTMLElement>('[data-dropdown]'));
+  const canHover = window.matchMedia('(hover: hover)').matches;
+
+  const setDropdown = (dropdown: HTMLElement, open: boolean) => {
+    const button = dropdown.querySelector<HTMLButtonElement>('[data-dropdown-toggle]');
+    const panel = dropdown.querySelector<HTMLElement>('[data-dropdown-panel]');
+    if (!button || !panel) return;
+    panel.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+    dropdown.querySelector('[data-chevron]')?.classList.toggle('rotate-180', open);
+  };
+  const closeAll = (except?: HTMLElement) => dropdowns.forEach((d) => d !== except && setDropdown(d, false));
+
+  dropdowns.forEach((dropdown) => {
+    const button = dropdown.querySelector<HTMLButtonElement>('[data-dropdown-toggle]');
+    if (!button) return;
+    let timer: number | undefined;
+
+    button.addEventListener('click', () => {
+      const open = button.getAttribute('aria-expanded') !== 'true';
+      closeAll(dropdown);
+      setDropdown(dropdown, open);
+    });
+
+    if (canHover) {
+      dropdown.addEventListener('mouseenter', () => {
+        window.clearTimeout(timer);
+        closeAll(dropdown);
+        setDropdown(dropdown, true);
+      });
+      dropdown.addEventListener('mouseleave', () => {
+        timer = window.setTimeout(() => setDropdown(dropdown, false), 160);
+      });
+    }
+
+    dropdown.addEventListener('focusout', (event) => {
+      if (!dropdown.contains(event.relatedTarget as Node | null)) setDropdown(dropdown, false);
+    });
+
+    dropdown.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        setDropdown(dropdown, false);
+        button.focus();
+      }
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!dropdowns.some((d) => d.contains(event.target as Node))) closeAll();
+  });
 </script>

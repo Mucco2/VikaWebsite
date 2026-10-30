@@ -1,24 +1,51 @@
 ---
 import Icon from './Icon.astro';
+import Img from './Img.astro';
 import type { Service } from '../config/site';
 import { withBase } from '../config/site';
 
 interface Props {
   service: Service;
+  /** Vis billede øverst på kortet */
+  image?: boolean;
 }
 
-const { service } = Astro.props;
+const { service, image = true } = Astro.props;
 ---
 
 <a
   href={withBase(`/ydelser/${service.slug}`)}
-  class="card group flex h-full flex-col p-7 transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
+  class="card group flex h-full flex-col overflow-hidden transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-lift"
 >
-  <span class="icon-tile"><Icon name={service.icon} /></span>
-  <h3 class="h3 mt-6">{service.title}</h3>
-  <p class="prose-text mt-3 flex-1 text-[0.95rem]">{service.short}</p>
-  <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-    Læs mere
-    <Icon name="arrowRight" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-  </span>
+  {
+    image && (
+      <div class="relative aspect-[4/3] overflow-hidden">
+        <Img
+          name={service.image}
+          alt=""
+          class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          sizes="(min-width: 1024px) 280px, (min-width: 640px) 50vw, 100vw"
+          widths={[400, 600, 900]}
+        />
+        <span class="icon-tile absolute bottom-4 left-4 bg-white shadow-soft">
+          <Icon name={service.icon} />
+        </span>
+      </div>
+    )
+  }
+  <div class="flex flex-1 flex-col p-7">
+    {
+      !image && (
+        <span class="icon-tile mb-6">
+          <Icon name={service.icon} />
+        </span>
+      )
+    }
+    <h3 class="h3">{service.title}</h3>
+    <p class="prose-text mt-3 flex-1 text-[0.95rem]">{service.short}</p>
+    <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+      Læs mere
+      <Icon name="arrowRight" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+    </span>
+  </div>
 </a>

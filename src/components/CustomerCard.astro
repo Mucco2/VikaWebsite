@@ -1,0 +1,46 @@
+---
+import Icon from './Icon.astro';
+import Img from './Img.astro';
+import type { CustomerType } from '../config/site';
+import { withBase } from '../config/site';
+
+interface Props {
+  customer: CustomerType;
+  class?: string;
+  sizes?: string;
+}
+
+const {
+  customer,
+  class: className,
+  sizes = '(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw',
+} = Astro.props;
+---
+
+<a
+  href={withBase(`/kunder/${customer.slug}`)}
+  class:list={[
+    'group relative isolate flex min-h-80 flex-col justify-end overflow-hidden rounded-2xl bg-brand-900 p-7 text-white shadow-soft',
+    className,
+  ]}
+>
+  <Img
+    name={customer.image}
+    alt=""
+    class="absolute inset-0 -z-10 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+    sizes={sizes}
+    widths={[400, 700, 1000, 1400]}
+  />
+  <div class="absolute inset-0 -z-10 bg-gradient-to-t from-brand-900/95 via-brand-900/65 to-brand-900/10"></div>
+  <span
+    class="inline-flex size-11 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/25 backdrop-blur-sm"
+  >
+    <Icon name={customer.icon} />
+  </span>
+  <h3 class="mt-5 text-xl font-semibold tracking-[-0.01em]">{customer.title}</h3>
+  <p class="mt-2 max-w-sm text-[0.95rem] leading-relaxed text-white/85">{customer.short}</p>
+  <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+    Læs mere
+    <Icon name="arrowRight" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+  </span>
+</a>

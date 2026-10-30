@@ -1,5 +1,11 @@
 ---
-import { withBase } from '../config/site';
+/**
+ * Toppen af en underside: brødkrummer, overskrift, tekst og evt. billede eller video.
+ * - image="navn" viser et billede fra src/assets/images/ i højre side.
+ * - <Fragment slot="media">…</Fragment> giver plads til fx en video i stedet.
+ */
+import Img from './Img.astro';
+import { site, withBase } from '../config/site';
 
 interface Props {
   eyebrow?: string;
@@ -7,41 +13,91 @@ interface Props {
   text?: string;
   /** Brødkrummer, fx [{ label: 'Ydelser', href: '/ydelser' }]. Den aktuelle side tilføjes automatisk. */
   crumbs?: { label: string; href: string }[];
+  image?: string;
+  imageAlt?: string;
 }
 
-const { eyebrow, title, text, crumbs } = Astro.props;
+const { eyebrow, title, text, crumbs, image, imageAlt = '' } = Astro.props;
+const hasMedia = Boolean(image) || Astro.slots.has('media');
+
+const breadcrumbLd = crumbs && {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { label: 'Forside', href: '/' },
+    ...crumbs,
+    { label: title, href: Astro.url.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '') || '/' },
+  ].map((crumb, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: crumb.label,
+    item: new URL(withBase(crumb.href), Astro.site ?? site.url).href,
+  })),
+};
 ---
 
 <section class="border-b border-line">
-  <div class="container-page pt-12 pb-16 sm:pt-16 sm:pb-20" data-reveal>
-    {
-      crumbs && (
-        <nav aria-label="Brødkrummer" class="mb-8">
-          <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
-            <li>
-              <a href={withBase('/')} class="transition-colors hover:text-brand-700">Forside</a>
-            </li>
-            {crumbs.map((crumb) => (
-              <li class="flex items-center gap-2">
-                <span aria-hidden="true">/</span>
-                <a href={withBase(crumb.href)} class="transition-colors hover:text-brand-700">
-                  {crumb.label}
+  <div
+    class:list={[
+      'container-page pt-10 pb-16 sm:pt-14 sm:pb-20',
+      hasMedia && 'grid items-center gap-12 lg:grid-cols-12 lg:gap-14',
+    ]}
+  >
+    <div class:list={[hasMedia ? 'lg:col-span-6' : 'max-w-3xl']} data-reveal>
+      {
+        crumbs && (
+          <nav aria-label="Brødkrummer" class="mb-8">
+            <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
+              <li>
+                <a href={withBase('/')} class="transition-colors hover:text-brand-700">
+                  Forside
                 </a>
               </li>
-            ))}
-            <li class="flex items-center gap-2">
-              <span aria-hidden="true">/</span>
-              <span aria-current="page" class="text-ink">{title}</span>
-            </li>
-          </ol>
-        </nav>
-      )
-    }
-    <div class="max-w-3xl">
+              {crumbs.map((crumb) => (
+                <li class="flex items-center gap-2">
+                  <span aria-hidden="true">/</span>
+                  <a href={withBase(crumb.href)} class="transition-colors hover:text-brand-700">
+                    {crumb.label}
+                  </a>
+                </li>
+              ))}
+              <li class="flex items-center gap-2">
+                <span aria-hidden="true">/</span>
+                <span aria-current="page" class="text-ink">
+                  {title}
+                </span>
+              </li>
+            </ol>
+          </nav>
+        )
+      }
       {eyebrow && <p class="eyebrow">{eyebrow}</p>}
       <h1 class:list={['h1', eyebrow && 'mt-4']}>{title}</h1>
       {text && <p class="lead mt-6 max-w-2xl">{text}</p>}
       <slot />
     </div>
+
+    {
+      hasMedia && (
+        <div class="lg:col-span-6" data-reveal>
+          {Astro.slots.has('media') ? (
+            <slot name="media" />
+          ) : (
+            <div class="relative">
+              <div class="absolute -top-4 -right-4 hidden size-40 rounded-full bg-brand-100/80 blur-2xl sm:block" />
+              <Img
+                name={image!}
+                alt={imageAlt}
+                priority
+                class="relative aspect-[4/3] w-full rounded-[2rem] object-cover shadow-lift"
+                sizes="(min-width: 1152px) 560px, (min-width: 1024px) 50vw, 100vw"
+              />
+            </div>
+          )}
+        </div>
+      )
+    }
   </div>
 </section>
+
+{breadcrumbLd && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />}

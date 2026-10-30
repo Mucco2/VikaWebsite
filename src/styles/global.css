@@ -123,6 +123,45 @@
     @apply font-medium text-brand-600 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-600;
   }
 
+  /* Artikler (Markdown i src/content/viden/) */
+  .prose-article {
+    @apply text-[1.075rem] leading-[1.8] text-pretty text-muted;
+  }
+  .prose-article > * + * {
+    @apply mt-6;
+  }
+  .prose-article h2 {
+    @apply mt-14 text-2xl leading-tight font-bold tracking-[-0.02em] text-balance text-ink sm:text-[1.7rem];
+  }
+  .prose-article h3 {
+    @apply mt-10 text-xl font-semibold tracking-[-0.01em] text-ink;
+  }
+  .prose-article h2 + *,
+  .prose-article h3 + * {
+    @apply mt-4;
+  }
+  .prose-article strong {
+    @apply font-semibold text-ink;
+  }
+  .prose-article a {
+    @apply font-semibold text-brand-600 underline decoration-brand-200 underline-offset-4 hover:decoration-brand-600;
+  }
+  .prose-article ul {
+    @apply list-disc space-y-2.5 pl-6 marker:text-brand-400;
+  }
+  .prose-article ol {
+    @apply list-decimal space-y-2.5 pl-6 marker:font-semibold marker:text-brand-600;
+  }
+  .prose-article li {
+    @apply pl-1.5;
+  }
+  .prose-article blockquote {
+    @apply rounded-2xl border-l-4 border-brand-400 bg-brand-50 px-6 py-5 text-lg text-ink;
+  }
+  .prose-article hr {
+    @apply my-12 border-line;
+  }
+
   /* Formularer */
   .field-label {
     @apply mb-2 block text-sm font-semibold text-ink;
@@ -159,4 +198,14 @@
     transform: none;
     transition: none;
   }
+}
+
+/* Elementer, der kun giver mening med JavaScript slået til */
+html:not(.js) .js-only {
+  display: none !important;
+}
+
+/* Skjul mobilbjælken, mens menuen er åben */
+html.menu-open [data-callbar] {
+  display: none;
 }

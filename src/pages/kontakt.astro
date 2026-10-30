@@ -2,9 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
 import Form from '../components/forms/Form.astro';
 import Field from '../components/forms/Field.astro';
-import { site, phoneHref, emailHref } from '../config/site';
+import { site, faqs, phoneHref, emailHref, withBase } from '../config/site';
 
 const items = [
   { icon: 'phone', label: 'Telefon', value: site.phone, href: phoneHref },
@@ -12,49 +13,85 @@ const items = [
   { icon: 'mapPin', label: 'Adresse', value: site.address },
   { icon: 'building', label: 'CVR', value: site.cvr },
 ] as const;
+
+const shortcuts = [
+  { icon: 'calendar', title: 'Mangler I en vikar?', text: 'Book direkte – så vender vi hurtigt tilbage.', href: '/book-vikar', label: 'Book en vikar' },
+  { icon: 'users', title: 'Vil du være vikar?', text: 'Send din ansøgning og dit CV.', href: '/bliv-vikar#ansoeg', label: 'Søg som vikar' },
+] as const;
 ---
 
 <BaseLayout
   title="Kontakt"
   description={`Kontakt ${site.name} på telefon ${site.phone} eller e-mail ${site.email}. Vi hjælper med pædagogiske vikarer og svarer hurtigt.`}
+  image="kontakt"
 >
   <PageHero
     eyebrow="Kontakt"
     title="Vi er her, når I har brug for os"
-    text="Ring, skriv eller send en besked via formularen. Vi svarer så hurtigt som muligt."
-  />
+    text="Ring, skriv eller send en besked via formularen. Vi svarer så hurtigt som muligt – og ved akut behov er telefonen altid hurtigst."
+    image="kontakt"
+    imageAlt="Smilende medarbejder, der vinker til sin computer under et videoopkald"
+  >
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+      <a href={phoneHref} class="btn btn-primary">
+        <Icon name="phone" class="size-4" />
+        Ring {site.phone}
+      </a>
+      <a href="#besked" class="btn btn-secondary">Skriv til os</a>
+    </div>
+  </PageHero>
 
   <section class="section">
     <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
-      <ul class="grid content-start gap-3 lg:col-span-4" data-reveal>
-        {
-          items.map((item) => {
-            const Tag = 'href' in item ? 'a' : 'div';
-            return (
-              <li>
-                <Tag
-                  href={'href' in item ? item.href : undefined}
-                  class:list={[
-                    'flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-line',
-                    'href' in item && 'transition-colors hover:ring-brand-300',
-                  ]}
-                >
-                  <span class="icon-tile">
-                    <Icon name={item.icon} />
-                  </span>
-                  <span class="min-w-0">
-                    <span class="block text-sm text-muted">{item.label}</span>
-                    <span class="block font-semibold break-words text-ink">{item.value}</span>
-                  </span>
-                </Tag>
-              </li>
-            );
-          })
-        }
-      </ul>
+      <div class="space-y-8 lg:col-span-4" data-reveal>
+        <ul class="grid content-start gap-3">
+          {
+            items.map((item) => {
+              const Tag = 'href' in item ? 'a' : 'div';
+              return (
+                <li>
+                  <Tag
+                    href={'href' in item ? item.href : undefined}
+                    class:list={[
+                      'flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-line',
+                      'href' in item && 'transition-colors hover:ring-brand-300',
+                    ]}
+                  >
+                    <span class="icon-tile">
+                      <Icon name={item.icon} />
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block text-sm text-muted">{item.label}</span>
+                      <span class="block font-semibold break-words text-ink">{item.value}</span>
+                    </span>
+                  </Tag>
+                </li>
+              );
+            })
+          }
+        </ul>
 
-      <div class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
-        <h2 class="h3 mb-8">Send os en besked</h2>
+        <ul class="space-y-3">
+          {
+            shortcuts.map((s) => (
+              <li class="rounded-2xl bg-brand-50 p-6">
+                <h2 class="flex items-center gap-2 font-semibold">
+                  <Icon name={s.icon} class="size-4 text-brand-600" />
+                  {s.title}
+                </h2>
+                <p class="prose-text mt-1.5 text-[0.95rem]">{s.text}</p>
+                <a href={withBase(s.href)} class="text-link mt-3 inline-block text-sm">
+                  {s.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div id="besked" class="card p-6 sm:p-10 lg:col-span-8" data-reveal>
+        <h2 class="h3">Send os en besked</h2>
+        <p class="prose-text mt-2 mb-8">Udfyld formularen, så vender vi tilbage hurtigst muligt.</p>
         <Form name="kontakt" endpoint="contact" submitLabel="Send besked">
           <Field label="Navn" name="navn" required autocomplete="name" />
           <Field label="E-mail" name="email" type="email" required autocomplete="email" />
@@ -67,8 +104,28 @@ const items = [
             patternMessage="Indtast et gyldigt telefonnummer med mindst 8 cifre."
           />
           <Field label="Institution / virksomhed" name="institution" autocomplete="organization" />
+          <Field
+            label="Hvad drejer det sig om?"
+            name="emne"
+            type="select"
+            options={['Booking af vikar', 'Samarbejdsaftale', 'Job som vikar', 'Andet']}
+            class="sm:col-span-2"
+          />
           <Field label="Besked" name="besked" type="textarea" required class="sm:col-span-2" />
         </Form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section border-t border-line bg-white" aria-labelledby="faq-titel">
+    <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Spørgsmål og svar</p>
+        <h2 id="faq-titel" class="h2 mt-3">Måske finder du svaret her</h2>
+        <a href={withBase('/faq')} class="text-link mt-6 inline-block text-[0.95rem]">Se alle spørgsmål</a>
+      </div>
+      <div class="lg:col-span-8" data-reveal>
+        <FaqList items={[faqs.institutioner[0], faqs.institutioner[1], faqs.vikarer[0], faqs.vikarer[1]]} />
       </div>
     </div>
   </section>

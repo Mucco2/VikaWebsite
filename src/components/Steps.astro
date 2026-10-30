@@ -1,0 +1,33 @@
+---
+/**
+ * "Sådan fungerer det" – trin med ikon og tekst, vandret på store skærme.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+interface Props {
+  steps: { icon: IconName; title: string; text: string }[];
+  class?: string;
+}
+
+const { steps, class: className } = Astro.props;
+const cols = steps.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3';
+---
+
+<ol class:list={['grid gap-10 md:gap-8', cols, className]}>
+  {
+    steps.map((step, i) => (
+      <li class="relative text-center" data-reveal>
+        {i < steps.length - 1 && (
+          <span class="absolute top-7 left-[calc(50%+3rem)] hidden h-px w-[calc(100%-6rem)] bg-line lg:block" />
+        )}
+        <span class="relative mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+          <Icon name={step.icon} class="size-6" />
+        </span>
+        <p class="mt-6 text-sm font-semibold text-brand-600">Trin {i + 1}</p>
+        <h3 class="h3 mt-1">{step.title}</h3>
+        <p class="prose-text mx-auto mt-3 max-w-xs text-[0.95rem]">{step.text}</p>
+      </li>
+    ))
+  }
+</ol>

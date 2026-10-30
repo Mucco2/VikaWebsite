@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { faqs } from '../config/site';
+
+const all = [...faqs.institutioner, ...faqs.vikarer];
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: all.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: { '@type': 'Answer', text: item.a },
+  })),
+};
+
+const groups = [
+  { id: 'institutioner', icon: 'building', title: 'For institutioner og kommuner', items: faqs.institutioner },
+  { id: 'vikarer', icon: 'users', title: 'For vikarer', items: faqs.vikarer },
+] as const;
+---
+
+<BaseLayout
+  title="Spørgsmål og svar"
+  description="Svar på de mest almindelige spørgsmål om at booke en pædagogisk vikar – og om at blive vikar: pris, screening, børneattest, vagter og løn."
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Spørgsmål og svar"
+    title="Det bliver vi ofte spurgt om"
+    text="Her har vi samlet svarene på de spørgsmål, vi oftest får – fra institutioner, der mangler en vikar, og fra dig, der gerne vil være vikar."
+  >
+    <ul class="mt-9 flex flex-wrap gap-2">
+      {
+        groups.map((group) => (
+          <li>
+            <a
+              href={`#${group.id}`}
+              class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 ring-line transition-colors hover:text-brand-700 hover:ring-brand-300"
+            >
+              <Icon name={group.icon} class="size-4 text-brand-600" />
+              {group.title}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </PageHero>
+
+  {
+    groups.map((group, i) => (
+      <section
+        id={group.id}
+        class:list={['section', i % 2 === 1 && 'border-y border-line bg-white']}
+        aria-labelledby={`${group.id}-titel`}
+      >
+        <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+          <div class="lg:col-span-4" data-reveal>
+            <span class="icon-tile">
+              <Icon name={group.icon} />
+            </span>
+            <h2 id={`${group.id}-titel`} class="h2 mt-6">
+              {group.title}
+            </h2>
+          </div>
+          <div class="lg:col-span-8" data-reveal>
+            <FaqList items={group.items} />
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <ContactSection title="Fandt du ikke svaret?" text="Ring eller skriv til os – så svarer vi så hurtigt som muligt." />
+</BaseLayout>

@@ -1,29 +1,47 @@
 ---
 import Icon from './Icon.astro';
-import { site, nav, services, phoneHref, emailHref, withBase } from '../config/site';
+import Logo from './Logo.astro';
+import { site, services, customerTypes, phoneHref, emailHref, withBase } from '../config/site';
+import type { IconName } from '../lib/icons';
 
 const year = new Date().getFullYear();
+
+const shortcuts = [
+  { label: 'Book en vikar', href: '/book-vikar' },
+  { label: 'Bliv vikar', href: '/bliv-vikar' },
+  { label: 'Sådan arbejder vi', href: '/saadan-arbejder-vi' },
+  { label: 'Viden og artikler', href: '/viden' },
+  { label: 'Spørgsmål og svar', href: '/faq' },
+  { label: 'Om os', href: '/om-os' },
+  { label: 'Kontakt', href: '/kontakt' },
+];
+
+const socials = (
+  [
+    { name: 'Facebook', icon: 'facebook', href: site.social.facebook },
+    { name: 'LinkedIn', icon: 'linkedin', href: site.social.linkedin },
+    { name: 'Instagram', icon: 'instagram', href: site.social.instagram },
+  ] satisfies { name: string; icon: IconName; href: string }[]
+).filter((s) => s.href);
+
+const linkClass = 'text-muted transition-colors hover:text-brand-700';
 ---
 
 <footer class="border-t border-line bg-white">
   <div class="container-page grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
     <div class="lg:col-span-4">
-      <a href={withBase('/')} class="text-lg font-bold tracking-tight">{site.name}</a>
-      <p class="prose-text mt-4 max-w-xs text-[0.95rem]">
+      <a href={withBase('/')} class="text-ink" aria-label={`${site.name} – forside`}><Logo /></a>
+      <p class="prose-text mt-5 max-w-xs text-[0.95rem]">
         Pædagogiske vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner.
       </p>
-    </div>
-
-    <div class="lg:col-span-3">
-      <h2 class="text-sm font-semibold text-ink">Kontakt</h2>
-      <ul class="mt-4 space-y-3 text-[0.95rem]">
+      <ul class="mt-6 space-y-3 text-[0.95rem]">
         <li>
-          <a href={phoneHref} class="inline-flex items-center gap-3 text-muted transition-colors hover:text-brand-700">
+          <a href={phoneHref} class="inline-flex items-center gap-3 font-semibold text-ink transition-colors hover:text-brand-700">
             <Icon name="phone" class="size-4 text-brand-600" />{site.phone}
           </a>
         </li>
         <li>
-          <a href={emailHref} class="inline-flex items-center gap-3 text-muted transition-colors hover:text-brand-700">
+          <a href={emailHref} class={`inline-flex items-center gap-3 ${linkClass}`}>
             <Icon name="mail" class="size-4 text-brand-600" />{site.email}
           </a>
         </li>
@@ -32,6 +50,24 @@ const year = new Date().getFullYear();
           <address class="not-italic">{site.address}</address>
         </li>
       </ul>
+      {
+        socials.length > 0 && (
+          <ul class="mt-6 flex gap-2">
+            {socials.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  rel="noopener"
+                  class="inline-flex size-10 items-center justify-center rounded-full bg-brand-50 text-brand-700 transition-colors hover:bg-brand-100"
+                >
+                  <Icon name={s.icon} class="size-4" />
+                  <span class="sr-only">{s.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </div>
 
     <div class="lg:col-span-2">
@@ -40,8 +76,23 @@ const year = new Date().getFullYear();
         {
           services.map((s) => (
             <li>
-              <a href={withBase(`/ydelser/${s.slug}`)} class="text-muted transition-colors hover:text-brand-700">
+              <a href={withBase(`/ydelser/${s.slug}`)} class={linkClass}>
                 {s.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="lg:col-span-3">
+      <h2 class="text-sm font-semibold text-ink">Hvem vi hjælper</h2>
+      <ul class="mt-4 space-y-3 text-[0.95rem]">
+        {
+          customerTypes.map((c) => (
+            <li>
+              <a href={withBase(`/kunder/${c.slug}`)} class={linkClass}>
+                {c.title}
               </a>
             </li>
           ))
@@ -52,11 +103,10 @@ const year = new Date().getFullYear();
     <div class="lg:col-span-3">
       <h2 class="text-sm font-semibold text-ink">Genveje</h2>
       <ul class="mt-4 space-y-3 text-[0.95rem]">
-        <li><a href={withBase('/book-vikar')} class="text-muted transition-colors hover:text-brand-700">Book en vikar</a></li>
         {
-          nav.map((item) => (
+          shortcuts.map((item) => (
             <li>
-              <a href={withBase(item.href)} class="text-muted transition-colors hover:text-brand-700">
+              <a href={withBase(item.href)} class={linkClass}>
                 {item.label}
               </a>
             </li>
@@ -69,7 +119,10 @@ const year = new Date().getFullYear();
   <div class="border-t border-line">
     <div class="container-page flex flex-col gap-2 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
       <p>&copy; {year} {site.name} · CVR {site.cvr}</p>
-      <a href={withBase('/privatlivspolitik')} class="transition-colors hover:text-brand-700">Privatlivspolitik</a>
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        <li><a href={withBase('/privatlivspolitik')} class="transition-colors hover:text-brand-700">Privatlivspolitik</a></li>
+        <li><a href={withBase('/faq')} class="transition-colors hover:text-brand-700">Spørgsmål og svar</a></li>
+      </ul>
     </div>
   </div>
 </footer>

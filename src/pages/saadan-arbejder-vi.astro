@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Img from '../components/Img.astro';
+import Checklist from '../components/Checklist.astro';
+import VideoPlayer from '../components/VideoPlayer.astro';
+import FaqList from '../components/FaqList.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { faqs, media, withBase } from '../config/site';
+import type { IconName } from '../lib/icons';
+
+const process: { title: string; text: string }[] = [
+  {
+    title: 'I kontakter os',
+    text: 'Ring eller book online. Ved akut behov er telefonen hurtigst – vi tager den tidligt om morgenen.',
+  },
+  {
+    title: 'Vi afklarer behovet',
+    text: 'Vi spørger ind til målgruppe, mødetider, opgaver og særlige hensyn. Kender vi jer i forvejen, går det ekstra hurtigt.',
+  },
+  {
+    title: 'Vi finder den rette vikar',
+    text: 'Vi matcher på uddannelse, erfaring og målgruppe – og sender gerne en vikar, I allerede kender.',
+  },
+  {
+    title: 'Overlevering',
+    text: 'I får besked om, hvem der kommer, og vikaren får de oplysninger, der skal til for at møde godt forberedt ind.',
+  },
+  {
+    title: 'Opfølgning',
+    text: 'Bagefter spørger vi, hvordan det gik. Jeres feedback bruger vi til at sende den rette vikar næste gang.',
+  },
+];
+
+const handover = [
+  'Dagens struktur og mødetider',
+  'Børn, elever eller borgere med særlige behov',
+  'Aftaler om allergier, medicin og afhentning',
+  'Hvem vikaren kan spørge i løbet af dagen',
+  'Jeres pædagogiske tilgang og vigtigste regler',
+];
+
+const agreements: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'zap', title: 'Akut hjælp', text: 'Når en kollega melder sig syg samme morgen. Ring, så finder vi en vikar hurtigst muligt.' },
+  { icon: 'calendar', title: 'Enkeltdage og korte forløb', text: 'Ferie, kurser, personaledage og travle perioder – fra få timer til flere uger.' },
+  { icon: 'repeat', title: 'Længere vikariater', text: 'Barsel, langtidssygdom og ledige stillinger – med den samme vikar hele vejen.' },
+  { icon: 'fileCheck', title: 'Faste aftaler', text: 'For institutioner og kommuner, der ønsker en fast samarbejdspartner og klare rammer.' },
+];
+
+const quality = [
+  'Personlig samtale med alle vikarer',
+  'Referencer fra tidligere arbejdsgivere',
+  'Børneattest på alle, der arbejder med børn og unge',
+  'Introduktion til arbejdet som vikar hos os',
+  'Løbende opfølgning med jer og vikaren',
+];
+---
+
+<BaseLayout
+  title="Sådan arbejder vi"
+  description="Sådan finder vi den rette pædagogiske vikar: afklaring, matchning, overlevering og opfølgning. Akut hjælp, korte forløb, længere vikariater og faste aftaler."
+  image="saadan-telefon"
+>
+  <PageHero
+    eyebrow="Sådan arbejder vi"
+    title="En god vikar starter med en god forberedelse"
+    text="Vi bruger tid på at forstå jeres hverdag, så vikaren kan bidrage fra første time. Her kan I se, hvordan et forløb ser ud – fra opkald til opfølgning."
+    image="saadan-telefon"
+    imageAlt="Smilende medarbejder, der taler i telefon og tager noter ved et skrivebord"
+  >
+    <a href={withBase('/book-vikar')} class="btn btn-primary mt-9">
+      Book en vikar
+      <Icon name="arrowRight" class="size-4" />
+    </a>
+  </PageHero>
+
+  <!-- Forløbet -->
+  <section class="section" aria-labelledby="forloeb-titel">
+    <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Forløbet</p>
+        <h2 id="forloeb-titel" class="h2 mt-3">Fem trin – ét opkald</h2>
+        <p class="lead mt-5">I skal kun ringe én gang. Vi klarer resten og holder jer orienteret undervejs.</p>
+      </div>
+      <ol class="relative lg:col-span-8">
+        {
+          process.map((step, i) => (
+            <li class="relative flex gap-6 pb-10 last:pb-0" data-reveal>
+              {i < process.length - 1 && <span class="absolute top-12 bottom-0 left-6 w-px bg-line" aria-hidden="true" />}
+              <span class="relative inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-600 text-base font-bold text-white">
+                {i + 1}
+              </span>
+              <div class="pt-2.5">
+                <h3 class="h3">{step.title}</h3>
+                <p class="prose-text mt-2 max-w-xl">{step.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Overlevering -->
+  <section class="section border-y border-line bg-white" aria-labelledby="overlevering-titel">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div data-reveal>
+        <Img
+          name="saadan-overlevering"
+          alt="To kolleger, der taler sammen over en kop kaffe i et personalerum"
+          class="aspect-[4/3] w-full rounded-[2rem] object-cover shadow-soft"
+          sizes="(min-width: 1152px) 540px, (min-width: 1024px) 50vw, 100vw"
+        />
+      </div>
+      <div data-reveal>
+        <p class="eyebrow">Overlevering</p>
+        <h2 id="overlevering-titel" class="h2 mt-3">En god overlevering gør hele forskellen</h2>
+        <p class="lead mt-5">
+          De første minutter betyder meget. Vi sørger for, at vikaren kender det vigtigste, før dagen går i gang – fx:
+        </p>
+        <Checklist items={handover} class="mt-8" />
+        <a href={withBase('/viden/tjekliste-til-vikaren')} class="text-link mt-8 inline-block text-[0.95rem]">
+          Hent inspiration i vores tjekliste
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aftaleformer -->
+  <section class="section" aria-labelledby="aftaler-titel">
+    <div class="container-page">
+      <div class="max-w-2xl" data-reveal>
+        <p class="eyebrow">Aftaleformer</p>
+        <h2 id="aftaler-titel" class="h2 mt-3">Hjælp, der passer til situationen</h2>
+        <p class="lead mt-5">Fra et akut opkald kl. 6.30 til en fast samarbejdsaftale med hele kommunen.</p>
+      </div>
+      <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          agreements.map((item) => (
+            <li class="card p-7" data-reveal>
+              <span class="icon-tile">
+                <Icon name={item.icon} />
+              </span>
+              <h3 class="h3 mt-6">{item.title}</h3>
+              <p class="prose-text mt-3 text-[0.95rem]">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Film + kvalitet -->
+  <section class="bg-brand-900 py-20 text-white sm:py-28" aria-labelledby="kvalitet-titel">
+    <div class="container-page grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-7" data-reveal>
+        <VideoPlayer video={media.film} poster={media.filmPoster} title={media.filmTitle} duration={media.filmDuration} />
+      </div>
+      <div class="lg:col-span-5" data-reveal>
+        <p class="text-sm font-semibold tracking-wide text-brand-200">Kvalitet</p>
+        <h2 id="kvalitet-titel" class="h2 mt-3">Kvalitet i hvert led</h2>
+        <p class="mt-5 text-lg leading-relaxed text-white/80">Ingen vikar kommer ud hos jer uden at have været igennem vores screening.</p>
+        <ul class="mt-8 space-y-4">
+          {
+            quality.map((item) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-white/15">
+                  <Icon name="check" class="size-3.5" strokeWidth={2.5} />
+                </span>
+                <span class="text-white/90">{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" aria-labelledby="faq-titel">
+    <div class="container-page grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-4" data-reveal>
+        <p class="eyebrow">Spørgsmål og svar</p>
+        <h2 id="faq-titel" class="h2 mt-3">Godt at vide</h2>
+        <a href={withBase('/faq')} class="text-link mt-6 inline-block text-[0.95rem]">Se alle spørgsmål</a>
+      </div>
+      <div class="lg:col-span-8" data-reveal>
+        <FaqList items={faqs.institutioner} />
+      </div>
+    </div>
+  </section>
+
+  <ContactSection />
+</BaseLayout>

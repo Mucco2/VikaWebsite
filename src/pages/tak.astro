@@ -2,9 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import { site, phoneHref, withBase } from '../config/site';
+
+const links = [
+  { icon: 'compass', title: 'Sådan arbejder vi', href: '/saadan-arbejder-vi' },
+  { icon: 'bookOpen', title: 'Viden og gode råd', href: '/viden' },
+  { icon: 'message', title: 'Spørgsmål og svar', href: '/faq' },
+] as const;
 ---
 
-<BaseLayout title="Tak for din henvendelse" noindex>
+<BaseLayout title="Tak for din henvendelse" noindex callBar={false}>
   <section class="container-page flex min-h-[60vh] items-center py-20">
     <div class="mx-auto max-w-xl text-center" data-reveal>
       <span class="mx-auto inline-flex size-16 items-center justify-center rounded-full bg-brand-600 text-white">
@@ -16,6 +22,27 @@ import { site, phoneHref, withBase } from '../config/site';
         <a href={phoneHref} class="text-link">{site.phone}</a>.
       </p>
       <a href={withBase('/')} class="btn btn-secondary mt-10">Tilbage til forsiden</a>
+
+      <div class="mt-16 border-t border-line pt-10">
+        <p class="text-sm font-semibold text-ink">Mens du venter</p>
+        <ul class="mt-5 grid gap-3 sm:grid-cols-3">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={withBase(link.href)}
+                  class="flex h-full flex-col items-center gap-3 rounded-2xl bg-white p-5 text-sm font-semibold ring-1 ring-line transition-colors hover:text-brand-700 hover:ring-brand-300"
+                >
+                  <span class="icon-tile">
+                    <Icon name={link.icon} />
+                  </span>
+                  {link.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </section>
 </BaseLayout>

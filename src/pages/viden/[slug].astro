@@ -1,0 +1,179 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { site, phoneHref, withBase } from '../../config/site';
+import { getArticles, articleHtml, audienceLabel, formatDate, readingTime, type Article } from '../../lib/articles';
+
+export const getStaticPaths = (async () => {
+  const articles = await getArticles();
+  return articles.map((article) => ({ params: { slug: article.id }, props: { article, all: articles } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  article: Article;
+  all: Article[];
+}
+
+const { article, all } = Astro.props;
+const { title, description, date, image, imageAlt, audience } = article.data;
+
+const related = [
+  ...all.filter((a) => a.id !== article.id && a.data.audience === audience),
+  ...all.filter((a) => a.id !== article.id && a.data.audience !== audience),
+].slice(0, 3);
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: date.toISOString(),
+  inLanguage: 'da-DK',
+  mainEntityOfPage: canonical,
+  author: { '@type': 'Organization', name: site.name, url: site.url },
+  publisher: { '@type': 'Organization', name: site.name, url: site.url },
+};
+
+const cta =
+  audience === 'vikarer'
+    ? {
+        title: 'Vil du være vikar hos os?',
+        text: 'Fleksible vagter, varierede arbejdspladser og en fast kontaktperson, der kender dig.',
+        primary: { label: 'Send din ansøgning', href: '/bliv-vikar#ansoeg' },
+      }
+    : {
+        title: 'Mangler I en vikar?',
+        text: 'Ring eller book online – så finder vi en tryg og kompetent vikar til jer.',
+        primary: { label: 'Book en vikar', href: '/book-vikar' },
+      };
+---
+
+<BaseLayout title={title} description={description} image={image} type="article" schema={schema}>
+  <article>
+    <header class="container-page pt-10 sm:pt-14">
+      <div class="mx-auto max-w-3xl" data-reveal>
+        <nav aria-label="Brødkrummer" class="mb-8">
+          <ol class="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <li><a href={withBase('/')} class="transition-colors hover:text-brand-700">Forside</a></li>
+            <li class="flex items-center gap-2">
+              <span aria-hidden="true">/</span>
+              <a href={withBase('/viden')} class="transition-colors hover:text-brand-700">Viden</a>
+            </li>
+          </ol>
+        </nav>
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+          <a
+            href={withBase(`/viden?for=${audience}`)}
+            class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100"
+          >
+            {audienceLabel[audience]}
+          </a>
+          <time datetime={date.toISOString()}>{formatDate(date)}</time>
+          <span aria-hidden="true">·</span>
+          <span>{readingTime(article.body)} min. læsning</span>
+        </p>
+        <h1 class="mt-5 text-[2.1rem] leading-[1.1] font-bold tracking-[-0.03em] text-balance sm:text-5xl">{title}</h1>
+        <p class="lead mt-6">{description}</p>
+      </div>
+      <div class="mx-auto mt-12 max-w-5xl" data-reveal>
+        <Picture
+          src={image}
+          alt={imageAlt}
+          widths={[600, 1000, 1500, 2000].filter((w) => w <= image.width)}
+          sizes="(min-width: 1024px) 1024px, 100vw"
+          formats={['avif', 'webp']}
+          quality={72}
+          loading="eager"
+          fetchpriority="high"
+          class="aspect-[16/9] w-full rounded-[2rem] object-cover shadow-soft"
+          pictureAttributes={{ class: 'contents' }}
+        />
+      </div>
+    </header>
+
+    <div class="container-page py-16 sm:py-20">
+      <div class="prose-article mx-auto max-w-3xl">
+        <Fragment set:html={articleHtml(article)} />
+      </div>
+
+      <div class="mx-auto mt-14 max-w-3xl">
+        <div class="flex flex-wrap items-center gap-3 border-y border-line py-6">
+          <span class="mr-2 text-sm font-semibold text-ink">Del artiklen</span>
+          <button
+            type="button"
+            class="js-only btn btn-secondary btn-sm"
+            data-copy-link={canonical}
+          >
+            <Icon name="clipboard" class="size-4 text-brand-600" />
+            <span data-copy-label>Kopiér link</span>
+          </button>
+          <a
+            href={`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(canonical)}`}
+            class="btn btn-secondary btn-sm"
+          >
+            <Icon name="mail" class="size-4 text-brand-600" />
+            Send på mail
+          </a>
+        </div>
+
+        <aside class="mt-12 rounded-3xl bg-brand-50 p-8 sm:p-10">
+          <h2 class="text-2xl font-bold tracking-[-0.02em]">{cta.title}</h2>
+          <p class="prose-text mt-3">{cta.text}</p>
+          <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+            <a href={withBase(cta.primary.href)} class="btn btn-primary">
+              {cta.primary.label}
+              <Icon name="arrowRight" class="size-4" />
+            </a>
+            <a href={phoneHref} class="btn btn-secondary">
+              <Icon name="phone" class="size-4 text-brand-600" />
+              Ring {site.phone}
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="border-t border-line bg-white py-20 sm:py-24" aria-labelledby="flere-titel">
+        <div class="container-page">
+          <div class="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <h2 id="flere-titel" class="h2" data-reveal>
+              Læs også
+            </h2>
+            <a href={withBase('/viden')} class="text-link shrink-0 text-[0.95rem]" data-reveal>
+              Alle artikler
+            </a>
+          </div>
+          <ul class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {related.map((item) => (
+              <li data-reveal>
+                <ArticleCard article={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((button) => {
+    const label = button.querySelector('[data-copy-label]');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyLink || window.location.href);
+        if (label) label.textContent = 'Link kopieret';
+        window.setTimeout(() => label && (label.textContent = 'Kopiér link'), 2500);
+      } catch {
+        window.prompt('Kopiér linket:', button.dataset.copyLink || window.location.href);
+      }
+    });
+  });
+</script>

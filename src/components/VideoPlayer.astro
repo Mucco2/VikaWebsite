@@ -1,0 +1,69 @@
+---
+/**
+ * Film med afspil-knap. Videoen hentes først, når man trykker afspil.
+ * Filerne ligger i public/videos/ (fx film.mp4 og film.da.vtt med undertekster).
+ */
+import fs from 'node:fs';
+import { getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { images } from '../lib/images';
+import { withBase } from '../config/site';
+
+interface Props {
+  video: string;
+  poster?: string;
+  title: string;
+  description?: string;
+  /** Vises på afspil-knappen, fx '0:40' */
+  duration?: string;
+  class?: string;
+}
+
+const { video, poster, title, description, duration, class: className } = Astro.props;
+
+const posterImage = poster ? images[poster] : undefined;
+const posterSrc = posterImage ? (await getImage({ src: posterImage, width: 1600, format: 'webp' })).src : undefined;
+const hasVtt = fs.existsSync(`public/videos/${video}.da.vtt`);
+const src = withBase(`/videos/${video}.mp4`);
+---
+
+<figure class={className}>
+  <div class="group relative aspect-video overflow-hidden rounded-3xl bg-ink shadow-lift" data-player>
+    <video class="h-full w-full object-cover" controls preload="none" playsinline poster={posterSrc} aria-label={title}>
+      <source src={src} type="video/mp4" />
+      {hasVtt && <track kind="captions" srclang="da" label="Dansk" src={withBase(`/videos/${video}.da.vtt`)} />}
+      Din browser kan ikke afspille videoen. <a href={src}>Hent filmen</a>.
+    </video>
+    <button
+      type="button"
+      class="js-only absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-4 bg-gradient-to-t from-black/55 via-black/10 to-black/0 text-white"
+      data-player-play
+    >
+      <span
+        class="inline-flex size-20 items-center justify-center rounded-full bg-white/95 text-brand-700 shadow-lift transition-transform duration-300 group-hover:scale-105 sm:size-24"
+      >
+        <Icon name="play" class="ml-1 size-8 fill-current" strokeWidth={1.5} />
+      </span>
+      <span class="text-sm font-semibold tracking-wide drop-shadow">
+        <span class="sr-only">Afspil filmen: {title}</span>
+        <span aria-hidden="true">Se filmen{duration && ` · ${duration}`}</span>
+      </span>
+    </button>
+  </div>
+  {description && <figcaption class="mt-4 text-sm leading-relaxed text-muted">{description}</figcaption>}
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-player]').forEach((player) => {
+    const video = player.querySelector('video');
+    const button = player.querySelector<HTMLButtonElement>('[data-player-play]');
+    if (!video || !button) return;
+    video.controls = false;
+    button.addEventListener('click', () => {
+      button.hidden = true;
+      video.controls = true;
+      video.play().catch(() => {});
+      video.focus();
+    });
+  });
+</script>

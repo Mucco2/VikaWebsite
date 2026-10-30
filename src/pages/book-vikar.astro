@@ -2,26 +2,47 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
+import Img from '../components/Img.astro';
+import Checklist from '../components/Checklist.astro';
 import Form from '../components/forms/Form.astro';
 import Field from '../components/forms/Field.astro';
-import { site, bookableRoles, phoneHref } from '../config/site';
+import { site, bookableRoles, customers, phoneHref } from '../config/site';
 
 const nextSteps = [
   'Vi kontakter jer hurtigt for at afklare behovet.',
   'Vi finder en vikar med den rette erfaring.',
   'I får besked om, hvem der kommer, og hvornår.',
 ];
+
+const promises = [
+  'Screenede vikarer med børneattest',
+  'Matchet på erfaring og målgruppe',
+  'Samme vikar ved længere forløb',
+];
 ---
 
 <BaseLayout
   title="Book en vikar"
   description="Book en pædagogisk vikar online. Fortæl os, hvem I mangler og hvornår – så finder vi en screenet vikar, der passer til jeres institution."
+  image="service-paedagoger"
+  callBar={false}
 >
   <PageHero
     eyebrow="Book en vikar"
     title="Fortæl os, hvem I mangler"
-    text="Udfyld formularen, så vender vi hurtigt tilbage med et forslag til en vikar."
-  />
+    text="Udfyld formularen, så vender vi hurtigt tilbage med et forslag til en vikar. Haster det, er det hurtigst at ringe."
+  >
+    <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-ink">
+      {
+        promises.map((item) => (
+          <li class="flex items-center gap-2">
+            <Icon name="check" class="size-4 text-brand-600" strokeWidth={2.5} />
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+  </PageHero>
 
   <section class="section">
     <div class="container-page grid gap-12 lg:grid-cols-12 lg:gap-16">
@@ -39,9 +60,17 @@ const nextSteps = [
             pattern="^\+?[0-9\s\-]{8,16}$"
             patternMessage="Indtast et gyldigt telefonnummer med mindst 8 cifre."
           />
-          <Field label="Faggruppe" name="faggruppe" type="select" required options={bookableRoles} class="sm:col-span-2" />
+          <Field label="Faggruppe" name="faggruppe" type="select" required options={bookableRoles} />
+          <Field label="Type arbejdsplads" name="arbejdsplads" type="select" options={[...customers, 'Andet']} />
           <Field label="Startdato" name="startdato" type="date" required minToday />
-          <Field label="Slutdato" name="slutdato" type="date" minToday after="startdato" hint="Lad feltet stå tomt ved enkeltdage." />
+          <Field
+            label="Slutdato"
+            name="slutdato"
+            type="date"
+            minToday
+            after="startdato"
+            hint="Lad feltet stå tomt ved enkeltdage."
+          />
           <Field
             label="Besked"
             name="besked"
@@ -75,6 +104,13 @@ const nextSteps = [
               ))
             }
           </ol>
+        </div>
+        <div class="hidden overflow-hidden rounded-2xl lg:block">
+          <Img name="saadan-telefon" alt="" class="aspect-[4/3] w-full object-cover" sizes="360px" widths={[400, 720]} />
+        </div>
+        <div class="rounded-2xl bg-white p-6 ring-1 ring-line">
+          <h2 class="font-semibold">Hvad vi lover</h2>
+          <Checklist items={promises} class="mt-4 text-[0.95rem]" />
         </div>
       </aside>
     </div>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import CustomerCard from '../../components/CustomerCard.astro';
+import ContactSection from '../../components/ContactSection.astro';
+import { customerTypes, withBase } from '../../config/site';
+import type { IconName } from '../../lib/icons';
+
+const promises: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'search', title: 'Vi lærer jer at kende', text: 'Vi spørger ind til jeres målgruppe, jeres rytme og jeres metoder, før vi sender en vikar.' },
+  { icon: 'userCheck', title: 'Vi matcher på erfaring', text: 'Vikaren vælges efter faglighed og erfaring med netop jeres børn, elever eller borgere.' },
+  { icon: 'repeat', title: 'Vi prioriterer kontinuitet', text: 'Ved længere forløb sender vi så vidt muligt den samme vikar hver gang.' },
+];
+---
+
+<BaseLayout
+  title="Hvem vi hjælper"
+  description="Vi leverer pædagogiske vikarer til daginstitutioner, skoler, specialskoler, bosteder og kommuner. Se, hvordan vi hjælper netop jeres type arbejdsplads."
+  image="kunder-daginstitutioner"
+>
+  <PageHero
+    eyebrow="Hvem vi hjælper"
+    title="Vikarer, der passer til jeres arbejdsplads"
+    text="En vuggestue, en specialskole og et bosted har vidt forskellige behov. Derfor tilpasser vi altid vikaren til jeres målgruppe og jeres hverdag."
+  />
+
+  <section class="section" aria-label="Målgrupper">
+    <div class="container-page">
+      <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          customerTypes.map((customer, i) => (
+            <li data-reveal class:list={[i === 0 && 'sm:col-span-2 lg:col-span-2']}>
+              <CustomerCard
+                customer={customer}
+                class="h-full min-h-96"
+                sizes={i === 0 ? '(min-width: 1024px) 760px, 100vw' : undefined}
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section border-y border-line bg-white" aria-labelledby="loefte-titel">
+    <div class="container-page">
+      <div class="max-w-2xl" data-reveal>
+        <p class="eyebrow">Uanset hvor I arbejder</p>
+        <h2 id="loefte-titel" class="h2 mt-3">Det kan I altid regne med</h2>
+      </div>
+      <ul class="mt-12 grid gap-5 md:grid-cols-3">
+        {
+          promises.map((item) => (
+            <li class="rounded-2xl bg-canvas p-8 ring-1 ring-line" data-reveal>
+              <span class="icon-tile bg-white">
+                <Icon name={item.icon} />
+              </span>
+              <h3 class="h3 mt-6">{item.title}</h3>
+              <p class="prose-text mt-3 text-[0.95rem]">{item.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-12" data-reveal>
+        <a href={withBase('/saadan-arbejder-vi')} class="text-link text-[0.95rem]">Læs mere om, hvordan vi arbejder</a>
+      </p>
+    </div>
+  </section>
+
+  <ContactSection
+    title="Står I ikke på listen?"
+    text="Vi hjælper også andre pædagogiske og sociale tilbud. Ring eller skriv, og fortæl os, hvad I har brug for."
+  />
+</BaseLayout>
